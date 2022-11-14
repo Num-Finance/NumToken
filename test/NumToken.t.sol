@@ -2,20 +2,15 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "NumToken.sol";
-import "gsn/forwarder/Forwarder.sol";
-import "gsn/RelayHub.sol";
-
-import "gsn/Penalizer.sol";
-import "gsn/StakeManager.sol";
-
-import "gsn/interfaces/IPaymaster.sol";
-import "gsn/BasePaymaster.sol";
-
-contract MyPaymaster is BasePaymaster {
-}
+import "openzeppelin/metatx/MinimalForwarder.sol";
 
 contract NumTokenTest is Test {
-    Forwarder forwarder;
+    bytes32 public constant EIP712_DOMAIN_TYPE_HASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+
+    bytes32 private constant FORWARDREQUEST_TYPEHASH =
+        keccak256("ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)");
+
+    MinimalForwarder forwarder;
     NumToken token;
     IPaymaster paymaster;
     RelayHub relayhub;
@@ -30,33 +25,19 @@ contract NumTokenTest is Test {
 
 
     constructor() {
-        forwarder = new Forwarder();
+        forwarder = new MinimalForwarder();
         token = new NumToken("Num ARS", "nuARS", address(forwarder));
-        paymaster = new MyPaymaster()
-        stakeManager = new StakeManager(
-            0,
-            0,
-            0,
-            address(0),
-            address(0)
+        bytes32 hashedName = keccak256(bytes(name));
+        bytes32 hashedVersion = keccak256(bytes(version));
+        bytes32 typeHash = keccak256(
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
-        relayhub = new RelayHub(
-            stakeManager, 
-            address(0),
-            address(0),
-            address(0),
-            RelayHubConfig({
-                maxWorkerCount: 1,
-                gasReserve: 100_000,
-                postOverhead: 0,
-                gasOverhead: 10_000,
-                minimumUnstakeDelay: 0,
-                devAddress: address(0),
-                devFee: 0,
-                baseRelayFee: 0,
-                pctRelayFee: 0;
-            })
-        );
+        _HASHED_NAME = hashedName;
+        _HASHED_VERSION = hashedVersion;
+        _CACHED_CHAIN_ID = block.chainid;
+        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(typeHash, hashedName, hashedVersion);
+        _CACHED_THIS = address(this);
+        _TYPE_HASH = typeHash;
     }
 
     modifier withMint() {
@@ -73,22 +54,47 @@ contract NumTokenTest is Test {
     function testRelay() public withMint {
         ForwardRequest memory req = ForwardRequest({
             from:   alice,
-            to:     bob,
+            to:     address(token),
             value:  0,
             gas:    1_000_000,
-            nonce:  0,
+            nonce:  forwarder.getNonce(alice),
             data:   abi.encodePacked(NumToken.transfer.selector, bob, uint256(1e18)),
             validUntilTime: type(uint256).max
         });
 
-        vm.sign(
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
             alice_pk,
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    keccak256()
+                    EIP712_DOMAIN_TYPE_HASH,
+                    keccak256(
+                        abi.encodePacked(
+                            FORWARDREQUEST_TYPEHASH,
+                            uint256(uint160(req.from)),
+                            uint256(uint160(req.to)),
+                            req.value,
+                            req.gas,
+                            req.nonce,
+                            keccak256(req.data),
+                            req.validUntilTime,
+                            suffixData
+                        )
+                    )
                 )
             )
-        )
+        );
+
+        forwarder.execute(
+            req,
+            EIP_DOMAIN_SEPARATOR,
+            TRANSFER_REQUEST_TYPE_HASH,
+            bytes(),
+            abi.encodePacked(
+                r,
+                s,
+                uint256(v)
+            )
+        );
     }
 }
