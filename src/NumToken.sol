@@ -18,6 +18,14 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
         return _symbol;
     }
 
+    function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
+        return ERC2771Context._msgSender();
+    }
+
+    function _msgData() internal view virtual override(Context, ERC2771Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
+    }
+
     bytes32 public constant MINTER_BURNER_ROLE = keccak256("MINTER_BURNER_ROLE");
 
     /* Disallow list control */
@@ -33,16 +41,9 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     event TaxCollectorChanged(address indexed newCollector);
     event TaxChanged(uint256 indexed basisPoints);
 
-    /* Access control */
-    modifier onlyRole(bytes32 role) {
-        require(hasRole(role, _msgSender()), "AccessControl: role required");
-        _;
-    }
-
     constructor(string memory name_, string memory symbol_, address forwarder_) ERC20(name_, symbol_) ERC2771Context(forwarder_) {
         _name = name_;
         _symbol = symbol_;
-        _setupDecimals(18);
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
@@ -73,9 +74,9 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
         // `recipient` should receive amount * (10000 - taxBasisPoints) / 10000
         // transfer tax should not be collected if `taxCollector` is not set
         uint256 tax = taxBasisPoints == 0 || taxCollector == address(0)?
-                      0 : amount.div(10_000).mul(taxBasisPoints);
+                      0 : amount * taxBasisPoints / 10_000;
 
-        super._transfer(sender, recipient, amount.sub(tax));
+        super._transfer(sender, recipient, amount - tax);
         
         if (tax > 0) {
             super._transfer(sender, taxCollector, tax);
@@ -89,8 +90,12 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     }
 
     function allow(address account) public onlyRole(DISALLOW_ROLE) {
-        _disallowed[account] = true;
+        _disallowed[account] = false;
         emit Allowed(account);
+    }
+
+    function isDisallowed(address account) public view returns (bool) {
+        return _disallowed[account];
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {

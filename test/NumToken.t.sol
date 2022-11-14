@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "NumToken.sol";
+import "src/NumToken.sol";
 import "openzeppelin/metatx/MinimalForwarder.sol";
 
 contract NumTokenTest is Test {
@@ -12,32 +12,20 @@ contract NumTokenTest is Test {
 
     MinimalForwarder forwarder;
     NumToken token;
-    IPaymaster paymaster;
-    RelayHub relayhub;
-    Penalizer penalizer;
-    StakeManager stakeManager;
 
-    address owner = address(type(uint256).max);
     bytes32 alice_pk = keccak256("ALICE'S PRIVATE KEY");
     bytes32 bob_pk   = keccak256("BOB'S PRIVATE KEY");
-    address alice    = vm.addr(alice_pk);
-    address bob      = vm.addr(bob_pk);
+    bytes32 carl_pk   = keccak256("CARL'S PRIVATE KEY");
+    bytes32 dani_pk   = keccak256("DANI'S PRIVATE KEY");
+    address alice    = vm.addr(uint256(alice_pk));
+    address bob      = vm.addr(uint256(bob_pk));
+    address carl     = vm.addr(uint256(carl_pk));
+    address dani     = vm.addr(uint256(dani_pk));
 
 
-    constructor() {
+    function setUp() public {
         forwarder = new MinimalForwarder();
         token = new NumToken("Num ARS", "nuARS", address(forwarder));
-        bytes32 hashedName = keccak256(bytes(name));
-        bytes32 hashedVersion = keccak256(bytes(version));
-        bytes32 typeHash = keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
-        _HASHED_NAME = hashedName;
-        _HASHED_VERSION = hashedVersion;
-        _CACHED_CHAIN_ID = block.chainid;
-        _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(typeHash, hashedName, hashedVersion);
-        _CACHED_THIS = address(this);
-        _TYPE_HASH = typeHash;
     }
 
     modifier withMint() {
@@ -46,11 +34,7 @@ contract NumTokenTest is Test {
         _;
     }
 
-    function testMint() public {
-        token.mint(alice, 1_000_000 * 1e18);
-        token.mint(bob, 1_000_000 * 1e18);
-    }
-
+    /*
     function testRelay() public withMint {
         ForwardRequest memory req = ForwardRequest({
             from:   alice,
@@ -96,5 +80,132 @@ contract NumTokenTest is Test {
                 uint256(v)
             )
         );
+    }
+    */
+
+    function testMintBurn() public {
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        vm.prank(alice);
+        token.mint(bob, 1e18);
+    }
+
+    function testFailMintBurn() public {
+        // alice should be the only one able to mint
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        vm.prank(bob);
+        token.mint(bob, 1e18);
+    }
+
+    function testEditMetadata() public {
+        token.grantRole(token.METADATA_ROLE(), alice);
+        vm.startPrank(alice);
+        token.setName("A");
+        token.setSymbol("A");
+        vm.stopPrank();
+
+        assertEq(
+            token.name(), "A"
+        );
+        assertEq(
+            token.symbol(), "A"
+        );
+    }
+
+    function testFailEditMetadataName() public {
+        // alice should be the only one able to edit
+        token.grantRole(token.METADATA_ROLE(), alice);
+        vm.prank(bob);
+        token.setName("A");
+    }
+
+    function testFailEditMetadataSymbol() public {
+        // alice should be the only one able to edit
+        token.grantRole(token.METADATA_ROLE(), alice);
+        vm.prank(bob);
+        token.setSymbol("A");
+    }
+
+    function testTaxSetting() public {
+        token.grantRole(token.TAX_ROLE(), alice);
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        vm.startPrank(alice);
+        token.setTaxBasisPoints(0);
+        token.mint(bob, 100e18);
+        token.setTaxCollector(alice);
+        vm.stopPrank();
+    }
+
+    function testTaxCalculation() public {
+        token.grantRole(token.TAX_ROLE(), alice);
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        // setup tax collector, taxBasisPoints == 0
+        vm.startPrank(alice);
+        token.mint(bob, 10e18);
+        token.setTaxCollector(alice);
+        vm.stopPrank();
+
+        vm.prank(bob);
+        token.transfer(carl, 1e18);
+
+        assertEq(
+            token.balanceOf(carl), 1e18, "cb"
+        );
+
+        // Set taxBasisPoints to 10, 0.1%
+        vm.prank(alice);
+        token.setTaxBasisPoints(10);
+
+        vm.prank(bob);
+        token.transfer(dani, 1e18);
+
+        assertEq(
+            token.balanceOf(dani), 1e18 - 1e15, "db"
+        );
+        assertEq(
+            token.balanceOf(bob), 8e18, "bb"
+        );
+        assertEq(
+            token.balanceOf(alice), 1e15, "ab"
+        );
+    }
+
+    function testDisallowList() public {
+        token.grantRole(token.DISALLOW_ROLE(), alice);
+
+        vm.prank(alice);
+        token.disallow(bob);
+
+        assertEq(
+            token.isDisallowed(bob), true
+        );
+
+        vm.prank(alice);
+        token.allow(bob);
+
+        assertEq(
+            token.isDisallowed(bob), false
+        );
+    }
+
+    function testCannotTransferWhenDisallowed() public {
+        token.grantRole(token.DISALLOW_ROLE(), alice);
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        vm.prank(alice);
+        token.mint(bob, 10e18);
+
+        vm.prank(bob);
+        token.transfer(carl, 1e18);
+
+        vm.prank(alice);
+        token.disallow(bob);
+
+        vm.prank(bob);
+        vm.expectRevert();
+        token.transfer(carl, 1e18);
     }
 }
