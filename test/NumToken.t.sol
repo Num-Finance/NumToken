@@ -208,4 +208,35 @@ contract NumTokenTest is Test {
         vm.expectRevert();
         token.transfer(carl, 1e18);
     }
+
+    function testPause() public {
+        token.grantRole(token.CIRCUIT_BREAKER_ROLE(), alice);
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        vm.prank(alice);
+        token.mint(bob, 10e18);
+
+        vm.prank(bob);
+        token.transfer(carl, 1e18);
+
+        vm.prank(alice);
+        token.togglePause();
+
+        vm.prank(bob);
+        vm.expectRevert();
+        token.transfer(carl, 1e18);
+
+        vm.startPrank(alice);
+        token.burn(carl, 1e18);
+        token.mint(bob, 1e18);
+        vm.stopPrank();
+
+        assertEq(
+            token.paused(), true
+        );
+
+        assertEq(
+            token.balanceOf(carl), 0
+        );
+    }
 }

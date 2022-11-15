@@ -41,6 +41,11 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     event TaxCollectorChanged(address indexed newCollector);
     event TaxChanged(uint256 indexed basisPoints);
 
+    /* Circuit breaker */
+    bytes32 public constant CIRCUIT_BREAKER_ROLE = keccak256("CIRCUIT_BREAKER_ROLE");
+    bool public paused = false;
+    event PauseStateChanged(bool indexed paused);
+
     constructor(string memory name_, string memory symbol_, address forwarder_) ERC20(name_, symbol_) ERC2771Context(forwarder_) {
         _name = name_;
         _symbol = symbol_;
@@ -70,6 +75,13 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
      * ERC20 _transfer override
      */
     function _transfer(address sender, address recipient, uint256 amount) internal override {
+        /**
+          Disallow transfers whenever the circuit breaker is pulled.
+          This check is done here since we have to allow mint() and burn()
+          calls while in this state, to enable clawback of funds if they are stolen.
+        */
+        require(!paused, "NumToken: transfers paused");
+
         // transfer tax is calculated based on amount sent.
         // `recipient` should receive amount * (10000 - taxBasisPoints) / 10000
         // transfer tax should not be collected if `taxCollector` is not set
@@ -113,6 +125,11 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     function setTaxCollector(address _taxCollector) public onlyRole(TAX_ROLE) {
         taxCollector = _taxCollector;
         emit TaxCollectorChanged(taxCollector);
+    }
+
+    function togglePause() public onlyRole(CIRCUIT_BREAKER_ROLE) {
+        paused = !paused;
+        emit PauseStateChanged(paused);
     }
 }
 
