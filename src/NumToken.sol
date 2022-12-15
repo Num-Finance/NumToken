@@ -21,13 +21,6 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     event Disallowed(address indexed account);
     event Allowed(address indexed account);
 
-    /* Transfer taxes */
-    bytes32 public constant TAX_ROLE = keccak256("TAX_ROLE");
-    address public taxCollector = address(0);
-    uint16 public taxBasisPoints = 0;
-    event TaxCollectorChanged(address indexed newCollector);
-    event TaxChanged(uint256 indexed basisPoints);
-
     /* Circuit breaker */
     bytes32 public constant CIRCUIT_BREAKER_ROLE = keccak256("CIRCUIT_BREAKER_ROLE");
     bool public paused = false;
@@ -58,17 +51,7 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
         */
         require(!paused, "NumToken: transfers paused");
 
-        // transfer tax is calculated based on amount sent.
-        // `recipient` should receive amount * (10000 - taxBasisPoints) / 10000
-        // transfer tax should not be collected if `taxCollector` is not set
-        uint256 tax = taxBasisPoints == 0 || taxCollector == address(0)?
-                      0 : amount * taxBasisPoints / 10_000;
-
-        super._transfer(sender, recipient, amount - tax);
-        
-        if (tax > 0) {
-            super._transfer(sender, taxCollector, tax);
-        }
+        super._transfer(sender, recipient, amount);
     }
 
     /* Disallow list management */
@@ -89,18 +72,6 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
         /* Disallow transfers to and from disallowed accounts */
         require(!_disallowed[from] && ! _disallowed[to], "NumToken: Disallowed account");
-    }
-
-    /* Tax configuration management */
-
-    function setTaxBasisPoints(uint16 bp) public onlyRole(TAX_ROLE) {
-        taxBasisPoints = bp;
-        emit TaxChanged(taxBasisPoints);
-    }
-
-    function setTaxCollector(address _taxCollector) public onlyRole(TAX_ROLE) {
-        taxCollector = _taxCollector;
-        emit TaxCollectorChanged(taxCollector);
     }
 
     function togglePause() public onlyRole(CIRCUIT_BREAKER_ROLE) {

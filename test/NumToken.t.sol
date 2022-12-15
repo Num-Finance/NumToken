@@ -107,52 +107,6 @@ contract NumTokenTest is Test {
         token.mint(bob, 1e18);
     }
 
-    function testTaxSetting() public {
-        token.grantRole(token.TAX_ROLE(), alice);
-        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
-
-        vm.startPrank(alice);
-        token.setTaxBasisPoints(0);
-        token.mint(bob, 100e18);
-        token.setTaxCollector(alice);
-        vm.stopPrank();
-    }
-
-    function testTaxCalculation() public {
-        token.grantRole(token.TAX_ROLE(), alice);
-        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
-
-        // setup tax collector, taxBasisPoints == 0
-        vm.startPrank(alice);
-        token.mint(bob, 10e18);
-        token.setTaxCollector(alice);
-        vm.stopPrank();
-
-        vm.prank(bob);
-        token.transfer(carl, 1e18);
-
-        assertEq(
-            token.balanceOf(carl), 1e18, "cb"
-        );
-
-        // Set taxBasisPoints to 10, 0.1%
-        vm.prank(alice);
-        token.setTaxBasisPoints(10);
-
-        vm.prank(bob);
-        token.transfer(dani, 1e18);
-
-        assertEq(
-            token.balanceOf(dani), 1e18 - 1e15, "db"
-        );
-        assertEq(
-            token.balanceOf(bob), 8e18, "bb"
-        );
-        assertEq(
-            token.balanceOf(alice), 1e15, "ab"
-        );
-    }
-
     function testDisallowList() public {
         token.grantRole(token.DISALLOW_ROLE(), alice);
 
