@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "src/NumToken.sol";
 import "openzeppelin/metatx/MinimalForwarder.sol";
+import "openzeppelin/proxy/beacon/BeaconProxy.sol";
+import "openzeppelin/proxy/beacon/UpgradeableBeacon.sol";
 
 contract NumTokenTest is Test {
     bytes32 public constant EIP712_DOMAIN_TYPE_HASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
@@ -11,7 +13,9 @@ contract NumTokenTest is Test {
         keccak256("ForwardRequest(address from,address to,uint256 value,uint256 gas,uint256 nonce,bytes data)");
 
     MinimalForwarder forwarder;
-    NumToken token;
+    NumToken tokenImpl;
+    UpgradeableBeacon beacon;
+    BeaconProxy tokenProxy;
 
     bytes32 alice_pk = keccak256("ALICE'S PRIVATE KEY");
     bytes32 bob_pk   = keccak256("BOB'S PRIVATE KEY");
@@ -25,10 +29,24 @@ contract NumTokenTest is Test {
 
     function setUp() public {
         forwarder = new MinimalForwarder();
-        token = new NumToken("Num ARS", "nARS", address(forwarder));
+        tokenImpl = new NumToken(address(forwarder));
+
+        beacon = new UpgradeableBeacon(address(tokenImpl));
+
+        tokenProxy = new BeaconProxy(
+            address(beacon), ""
+            // abi.encodePacked(
+            //     NumToken.initialize.selector,
+            //     "Num ARS",
+            //     "nARS"
+            // )
+        );
+        NumToken(address(tokenProxy)).initialize("Num ARS", "nARS", address(forwarder));
     }
 
     function testMetadata() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         assertEq(
             token.name(), "Num ARS"
         );
@@ -38,6 +56,8 @@ contract NumTokenTest is Test {
     }
 
     modifier withMint() {
+        NumToken token = NumToken(address(tokenProxy));
+
         token.mint(alice, 1_000_000 * 1e18);
         token.mint(bob, 1_000_000 * 1e18);
         _;
@@ -93,6 +113,8 @@ contract NumTokenTest is Test {
     */
 
     function testMintBurn() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         token.grantRole(token.MINTER_BURNER_ROLE(), alice);
 
         vm.prank(alice);
@@ -100,6 +122,8 @@ contract NumTokenTest is Test {
     }
 
     function testFailMintBurn() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         // alice should be the only one able to mint
         token.grantRole(token.MINTER_BURNER_ROLE(), alice);
 
@@ -108,6 +132,8 @@ contract NumTokenTest is Test {
     }
 
     function testDisallowList() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         token.grantRole(token.DISALLOW_ROLE(), alice);
 
         vm.prank(alice);
@@ -126,6 +152,8 @@ contract NumTokenTest is Test {
     }
 
     function testCannotTransferWhenDisallowed() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         token.grantRole(token.DISALLOW_ROLE(), alice);
         token.grantRole(token.MINTER_BURNER_ROLE(), alice);
 
@@ -144,6 +172,8 @@ contract NumTokenTest is Test {
     }
 
     function testPause() public {
+        NumToken token = NumToken(address(tokenProxy));
+
         token.grantRole(token.CIRCUIT_BREAKER_ROLE(), alice);
         token.grantRole(token.MINTER_BURNER_ROLE(), alice);
 

@@ -1,15 +1,15 @@
 pragma solidity ^0.8.13;
 
-import "openzeppelin/token/ERC20/ERC20.sol";
-import "openzeppelin/access/AccessControl.sol";
+import "openzeppelin-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "openzeppelin-upgradeable/access/AccessControlUpgradeable.sol";
 import "openzeppelin/metatx/ERC2771Context.sol";
 
-contract NumToken is ERC20, AccessControl, ERC2771Context {
-    function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
+contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context {
+    function _msgSender() internal view virtual override(ContextUpgradeable, ERC2771Context) returns (address) {
         return ERC2771Context._msgSender();
     }
 
-    function _msgData() internal view virtual override(Context, ERC2771Context) returns (bytes calldata) {
+    function _msgData() internal view virtual override(ContextUpgradeable, ERC2771Context) returns (bytes calldata) {
         return ERC2771Context._msgData();
     }
 
@@ -26,9 +26,15 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     bool public paused = false;
     event PauseStateChanged(bool indexed paused);
 
-    constructor(string memory name_, string memory symbol_, address forwarder_) ERC20(name_, symbol_) ERC2771Context(forwarder_) {
+    constructor(address forwarder_) ERC2771Context(forwarder_) {}
+    
+
+    function initialize(string memory name_, string memory symbol_, address forwarder_) public initializer {
+        __ERC20_init(name_, symbol_);
+        __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
+
 
     /* Mint/Burn */
 
