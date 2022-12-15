@@ -5,19 +5,6 @@ import "openzeppelin/access/AccessControl.sol";
 import "openzeppelin/metatx/ERC2771Context.sol";
 
 contract NumToken is ERC20, AccessControl, ERC2771Context {
-    /* Metadata modification role */
-    bytes32 public constant METADATA_ROLE = keccak256("METADATA_ROLE");
-    string private _name;
-    string private _symbol;
-
-    function name() public override view returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public override view returns (string memory) {
-        return _symbol;
-    }
-
     function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
         return ERC2771Context._msgSender();
     }
@@ -47,18 +34,7 @@ contract NumToken is ERC20, AccessControl, ERC2771Context {
     event PauseStateChanged(bool indexed paused);
 
     constructor(string memory name_, string memory symbol_, address forwarder_) ERC20(name_, symbol_) ERC2771Context(forwarder_) {
-        _name = name_;
-        _symbol = symbol_;
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-    }
-
-    /* Metadata */
-    function setName(string memory name_) public onlyRole(METADATA_ROLE) {
-        _name = name_;
-    }
-
-    function setSymbol(string memory symbol_) public onlyRole(METADATA_ROLE) {
-        _symbol = symbol_;
     }
 
     /* Mint/Burn */

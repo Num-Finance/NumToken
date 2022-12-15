@@ -25,7 +25,16 @@ contract NumTokenTest is Test {
 
     function setUp() public {
         forwarder = new MinimalForwarder();
-        token = new NumToken("Num ARS", "nuARS", address(forwarder));
+        token = new NumToken("Num ARS", "nARS", address(forwarder));
+    }
+
+    function testMetadata() public {
+        assertEq(
+            token.name(), "Num ARS"
+        );
+        assertEq(
+            token.symbol(), "nARS"
+        );
     }
 
     modifier withMint() {
@@ -96,35 +105,6 @@ contract NumTokenTest is Test {
 
         vm.prank(bob);
         token.mint(bob, 1e18);
-    }
-
-    function testEditMetadata() public {
-        token.grantRole(token.METADATA_ROLE(), alice);
-        vm.startPrank(alice);
-        token.setName("A");
-        token.setSymbol("A");
-        vm.stopPrank();
-
-        assertEq(
-            token.name(), "A"
-        );
-        assertEq(
-            token.symbol(), "A"
-        );
-    }
-
-    function testFailEditMetadataName() public {
-        // alice should be the only one able to edit
-        token.grantRole(token.METADATA_ROLE(), alice);
-        vm.prank(bob);
-        token.setName("A");
-    }
-
-    function testFailEditMetadataSymbol() public {
-        // alice should be the only one able to edit
-        token.grantRole(token.METADATA_ROLE(), alice);
-        vm.prank(bob);
-        token.setSymbol("A");
     }
 
     function testTaxSetting() public {
