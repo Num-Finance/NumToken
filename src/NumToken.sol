@@ -95,7 +95,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @notice Burns {amount} tokens from {account}.
      * @dev Can only be called by members of {MINTER_BURNER_ROLE}. Falls back to ERC20Upgradeable::_burn
      * @param account Address to burn tokens from.
-     * @param acmount Amount of tokens to burn.
+     * @param amount Amount of tokens to burn.
      */
     function burn(address account, uint256 amount) public onlyRole(MINTER_BURNER_ROLE) {
         _burn(account, amount);
