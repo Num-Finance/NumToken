@@ -70,9 +70,8 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @dev As per Initializable::initialize this function can only be called once.
      * @param name_ The name the token should have.
      * @param symbol_ The symbol the token should have.
-     * @param forwarder_ (unused) The ERC2771-compliant forwarder contract to be used.
      */
-    function initialize(string memory name_, string memory symbol_, address forwarder_) public initializer {
+    function initialize(string memory name_, string memory symbol_) public initializer {
         __ERC20_init(name_, symbol_);
         __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());

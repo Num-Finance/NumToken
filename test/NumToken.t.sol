@@ -41,7 +41,7 @@ contract NumTokenTest is Test {
             //     "nARS"
             // )
         );
-        NumToken(address(tokenProxy)).initialize("Num ARS", "nARS", address(forwarder));
+        NumToken(address(tokenProxy)).initialize("Num ARS", "nARS");
     }
 
     function testMetadata() public {

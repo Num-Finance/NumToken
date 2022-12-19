@@ -14,6 +14,10 @@ contract NumTokenDeploy is Script {
 
         MinimalForwarder forwarder = new MinimalForwarder();
 
+        // NOTE: `forwarder` is immutable and can't be changed after deployment.
+        //        we're using a MinimalForwarder here which provides basic functionality
+        //        for metatransactions - but this scheme does ** NOT ** support upgrades to this
+        //        variable. Consider making the forwarder upgradeable?
         NumToken tokenImpl = new NumToken(address(forwarder));
 
         UpgradeableBeacon beacon = new UpgradeableBeacon(address(tokenImpl));
@@ -27,8 +31,7 @@ contract NumTokenDeploy is Script {
         /// Deploy a token instance
         NumToken(address(tokenProxy)).initialize(
             "Num ARS",
-            "nARS",
-            address(forwarder)
+            "nARS"
         );
 
         /// Set up roles
