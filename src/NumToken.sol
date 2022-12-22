@@ -31,6 +31,14 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
     }
 
     /**
+     * @dev ERC2771Context-aware onlyRole modifier. The one provided by AccessControlUpgradeable uses msg.sender instead of _msgSender().
+     */
+    modifier only2771Role(bytes32 role) {
+        _checkRole(role, _msgSender());
+        _;
+    }
+
+    /**
      * @notice Role in charge of minting and burning tokens.
      */
     bytes32 public constant MINTER_BURNER_ROLE = keccak256("MINTER_BURNER_ROLE");
@@ -86,7 +94,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @param account Address to mint to.
      * @param amount Amount of tokens to mint.
      */
-    function mint(address account, uint256 amount) public onlyRole(MINTER_BURNER_ROLE) {
+    function mint(address account, uint256 amount) public only2771Role(MINTER_BURNER_ROLE) {
         _mint(account, amount);
     }
 
@@ -96,7 +104,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @param account Address to burn tokens from.
      * @param amount Amount of tokens to burn.
      */
-    function burn(address account, uint256 amount) public onlyRole(MINTER_BURNER_ROLE) {
+    function burn(address account, uint256 amount) public only2771Role(MINTER_BURNER_ROLE) {
         _burn(account, amount);
     }
 
@@ -124,7 +132,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @notice Disallows {account} from sending/receiving tokens. Only callable by members of {DISALLOW_ROLE}
      * @param account Address to disallow.
      */
-    function disallow(address account) public onlyRole(DISALLOW_ROLE) {
+    function disallow(address account) public only2771Role(DISALLOW_ROLE) {
         _disallowed[account] = true;
         emit Disallowed(account);
     }
@@ -133,7 +141,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @notice Re-allows {account} to send or receive tokens. Only callable by members of {DISALLOW_ROLE}
      * @param account Address to allow.
      */
-    function allow(address account) public onlyRole(DISALLOW_ROLE) {
+    function allow(address account) public only2771Role(DISALLOW_ROLE) {
         _disallowed[account] = false;
         emit Allowed(account);
     }
@@ -161,7 +169,7 @@ contract NumToken is ERC20Upgradeable, AccessControlUpgradeable, ERC2771Context 
      * @notice Toggles the circuit breaker, pausing or unpausing the contract.
      * @dev only callable by members of {CIRCUIT_BREAKER_ROLE}
      */
-    function togglePause() public onlyRole(CIRCUIT_BREAKER_ROLE) {
+    function togglePause() public only2771Role(CIRCUIT_BREAKER_ROLE) {
         paused = !paused;
         emit PauseStateChanged(paused);
     }
