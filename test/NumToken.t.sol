@@ -41,7 +41,9 @@ contract NumTokenTest is Test {
             //     "nARS"
             // )
         );
-        NumToken(address(tokenProxy)).initialize("Num ARS", "nARS");
+
+        NumToken token = NumToken(address(tokenProxy));
+        token.initialize("Num ARS", "nARS");
     }
 
     function testMetadata() public {
@@ -57,68 +59,85 @@ contract NumTokenTest is Test {
 
     modifier withMint() {
         NumToken token = NumToken(address(tokenProxy));
+        token.grantRole(token.MINTER_BURNER_ROLE(), address(this));
 
         token.mint(alice, 1_000_000 * 1e18);
         token.mint(bob, 1_000_000 * 1e18);
         _;
     }
 
-    /*
-    function testRelay() public withMint {
-        ForwardRequest memory req = ForwardRequest({
-            from:   alice,
-            to:     address(token),
-            value:  0,
-            gas:    1_000_000,
-            nonce:  forwarder.getNonce(alice),
-            data:   abi.encodePacked(NumToken.transfer.selector, bob, uint256(1e18)),
-            validUntilTime: type(uint256).max
+    function relayCall(
+        address from,
+        bytes32 from_pk,
+        address to,
+        uint256 value,
+        uint256 gas,
+        bytes memory data
+        ) internal returns (bool, bytes memory)
+    {
+        MinimalForwarder.ForwardRequest memory req = MinimalForwarder.ForwardRequest({
+            from:   from,
+            to:     to,
+            value:  value,
+            gas:    gas,
+            nonce:  forwarder.getNonce(from),
+            data:   data
         });
 
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
-            alice_pk,
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    EIP712_DOMAIN_TYPE_HASH,
-                    keccak256(
-                        abi.encodePacked(
-                            FORWARDREQUEST_TYPEHASH,
-                            uint256(uint160(req.from)),
-                            uint256(uint160(req.to)),
-                            req.value,
-                            req.gas,
-                            req.nonce,
-                            keccak256(req.data),
-                            req.validUntilTime,
-                            suffixData
-                        )
-                    )
-                )
+        bytes32 forwardRequestHash = keccak256(
+            abi.encode(
+                FORWARDREQUEST_TYPEHASH,
+                req.from,
+                req.to,
+                req.value,
+                req.gas, 
+                req.nonce,
+                keccak256(req.data)
             )
         );
 
-        forwarder.execute(
+        bytes32 domainSeparator = keccak256(
+            abi.encode(
+                EIP712_DOMAIN_TYPE_HASH,
+                keccak256(bytes("MinimalForwarder")),
+                keccak256(bytes("0.0.1")),
+                block.chainid,
+                address(forwarder)
+            )
+        );
+
+        bytes32 typedDataHash = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainSeparator,
+                forwardRequestHash
+            )
+        );
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+            uint256(from_pk),
+            typedDataHash
+        );
+
+        return forwarder.execute(
             req,
-            EIP_DOMAIN_SEPARATOR,
-            TRANSFER_REQUEST_TYPE_HASH,
-            bytes(),
             abi.encodePacked(
                 r,
                 s,
-                uint256(v)
+                v
             )
         );
     }
-    */
 
     function testMintBurn() public {
         NumToken token = NumToken(address(tokenProxy));
 
         token.grantRole(token.MINTER_BURNER_ROLE(), alice);
 
-        vm.prank(alice);
+        vm.startPrank(alice);
         token.mint(bob, 1e18);
+        token.burn(bob, 1e18);
+        vm.stopPrank();
     }
 
     function testFailMintBurn() public {
@@ -202,5 +221,139 @@ contract NumTokenTest is Test {
         assertEq(
             token.balanceOf(carl), 0
         );
+    }
+
+    /** Relay tests **/
+    function testRelayTransfer() public withMint {
+        relayCall(
+            alice,
+            alice_pk,
+            address(tokenProxy),
+            0,
+            1_000_000,
+            abi.encodePacked(IERC20Upgradeable.transfer.selector, bob, uint256(1e18))
+        );
+    }
+
+    function testRelayMint() public {
+        NumToken token = NumToken(address(tokenProxy));
+
+        token.grantRole(token.MINTER_BURNER_ROLE(), alice);
+
+        bool success;
+
+        (success, ) = relayCall(
+            alice,
+            alice_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.mint.selector,
+                abi.encode(dani),
+                type(uint256).max
+            )
+        );
+
+        assertEq(success, true);
+
+        (success, ) = relayCall(
+            bob,
+            bob_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.mint.selector,
+                abi.encode(bob),
+                uint256(1338)
+            )
+        );
+
+        assertEq(success, false);
+    }
+
+    function testRelayPause() public {
+        NumToken token = NumToken(address(tokenProxy));
+
+        token.grantRole(token.CIRCUIT_BREAKER_ROLE(), alice);
+
+        bool success;
+
+        (success, ) = relayCall(
+            alice,
+            alice_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.togglePause.selector
+            )
+        );
+
+        assertEq(success, true);
+
+       (success, ) = relayCall(
+            bob,
+            bob_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.togglePause.selector
+            )
+        ); 
+
+        assertEq(success, false);
+    }
+
+    function testRelayDisallowList() public {
+        NumToken token = NumToken(address(tokenProxy));
+
+        token.grantRole(token.DISALLOW_ROLE(), alice);
+
+       bool success;
+
+        (success, ) = relayCall(
+            alice,
+            alice_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.disallow.selector,
+                abi.encode(carl)
+            )
+        );
+
+        assertEq(success, true);
+
+       (success, ) = relayCall(
+            alice,
+            alice_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.allow.selector,
+                abi.encode(dani)
+            )
+        ); 
+
+        assertEq(success, true); 
+
+        (success, ) = relayCall(
+            bob,
+            bob_pk,
+            address(token),
+            0,
+            1_000_000,
+            abi.encodePacked(
+                NumToken.disallow.selector,
+                abi.encode(dani)
+            )
+        ); 
+
+        assertEq(success, false); 
     }
 }
