@@ -68,6 +68,14 @@ contract NumTokenDeploy is Script {
                 );
         }
 
+        address defaultadmin = vm.envAddress("DEFAULT_ADMIN_ROLE");
+
+        token.grantRole(
+            token.DEFAULT_ADMIN_ROLE(),
+            defaultadmin
+        );
+
+
         token.renounceRole(
             token.DEFAULT_ADMIN_ROLE(),
             vm.addr(deployerPrivateKey)
