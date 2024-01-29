@@ -59,7 +59,7 @@ contract VendingMachine is Initializable, ERC2771Context {
     event BulkOrderFulfilled(uint256 indexed orderId);
 
     modifier onlyManager() {
-        assert(_msgSender() == managerWallet);
+        require(_msgSender() == managerWallet, "only manager");
         _;
     }
 
@@ -94,7 +94,7 @@ contract VendingMachine is Initializable, ERC2771Context {
     }
 
     function setMintingFee(uint16 newMintingFee) public onlyManager {
-        assert(newMintingFee <= 10000);
+        require(newMintingFee <= 10000, "minting fee is capped at 10k bp");
         mintingFeeBp = newMintingFee;
     }
 
@@ -103,17 +103,19 @@ contract VendingMachine is Initializable, ERC2771Context {
 
         bulk.stableTokenReceived += request.stableTokenAmount;
         bulk.etfTokenReceived += request.etfTokenAmount;
-        bulk.requests[++bulk.requestCount] = request;
+        bulk.requests[bulk.requestCount++] = request;
         index = bulk.requestCount;
     }
 
     function requestMint(uint256 stableTokenAmount) public onlyBulkOrderActive {
         uint256 mintFee = stableTokenAmount * mintingFeeBp / 10000;
-        assert(
-            stableToken.transferFrom(_msgSender(), address(this), stableTokenAmount - mintFee)
+        require(
+            stableToken.transferFrom(_msgSender(), address(this), stableTokenAmount - mintFee),
+            "transfer to contract failed"
         );
-        assert(
-            stableToken.transferFrom(_msgSender(), feeWallet, mintFee)
+        require(
+            stableToken.transferFrom(_msgSender(), feeWallet, mintFee),
+            "transfer to fee wallet failed"
         );
 
         // TODO: queue mint
