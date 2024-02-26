@@ -1,14 +1,12 @@
 pragma solidity ^0.8.22;
 
 import "openzeppelin/access/AccessControl.sol";
-import "forge-std/console.sol";
 
 contract KYCMapper is AccessControl {
     bytes32 public constant KYC_ADMIN_ROLE = keccak256("KYC_ADMIN_ROLE");
     mapping(address => bool) public isAddressWhitelisted;
 
     constructor() {
-        console.log(msg.sender);
         _grantRole(
             DEFAULT_ADMIN_ROLE,
             msg.sender
