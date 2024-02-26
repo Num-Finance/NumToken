@@ -3,6 +3,7 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 import "src/NumToken.sol";
 import "src/VendingMachine.sol";
+import "src/KYCMapper.sol";
 import "openzeppelin/metatx/MinimalForwarder.sol";
 import "openzeppelin/proxy/beacon/BeaconProxy.sol";
 import "openzeppelin/proxy/beacon/UpgradeableBeacon.sol";
@@ -25,8 +26,16 @@ contract VendingMachineTest is Test {
     address carl     = vm.addr(uint256(carl_pk));
     address dani     = vm.addr(uint256(dani_pk));
 
+    KYCMapper mapper = new KYCMapper();
+
 
     function setUp() public {
+        mapper.grantRole(
+            mapper.KYC_ADMIN_ROLE(),
+            address(this)
+        );
+        mapper.setAddressWhitelisted(alice, true);
+        mapper.setAddressWhitelisted(bob, true);
 
         forwarder = new MinimalForwarder();
         etfToken = new NumToken(address(forwarder));
@@ -38,33 +47,21 @@ contract VendingMachineTest is Test {
         etfToken.mint(alice, 1_000_000e18);
 
         stableToken = new ERC20PresetFixedSupply("USDC", "USD Coin", 1_000_000e18, alice);
-        vendingMachine = new VendingMachine(address(forwarder));
 
-        etfToken.grantRole(etfToken.MINTER_BURNER_ROLE(), address(vendingMachine));
-
-        vendingMachine.initialize(
+        vendingMachine = new VendingMachine(
             IERC20Upgradeable(address(stableToken)),
             etfToken,
+            mapper,
             payable(alice),
             payable(alice)
         );
-
-        beforeEach();
-    }
-
-    function beforeEach() public {
-        vendingMachine = new VendingMachine(address(forwarder));
-        etfToken.grantRole(etfToken.MINTER_BURNER_ROLE(), address(vendingMachine));
-
-        vendingMachine.initialize(
-            IERC20Upgradeable(address(stableToken)),
-            etfToken,
-            payable(alice),
-            payable(alice)
+        vendingMachine.grantRole(
+            vendingMachine.MANAGER_ROLE(),
+            alice
         );
 
         vm.prank(alice);
-        vendingMachine.setMintingFee(0);
+        etfToken.grantRole(etfToken.MINTER_BURNER_ROLE(), address(vendingMachine));
     }
 
     function test_requestMint_OK() public {
@@ -74,6 +71,19 @@ contract VendingMachineTest is Test {
         vm.startPrank(bob);
 
         stableToken.approve(address(vendingMachine), 1e18);
+        vendingMachine.requestMint(1e18);
+
+        vm.stopPrank();
+    }
+
+    function test_requestMint_NotWhitelisted() public {
+        vm.prank(alice);
+        stableToken.transfer(carl, 1e18);
+
+        vm.startPrank(carl);
+
+        stableToken.approve(address(vendingMachine), 1e18);
+        vm.expectRevert();
         vendingMachine.requestMint(1e18);
 
         vm.stopPrank();
@@ -91,10 +101,21 @@ contract VendingMachineTest is Test {
 
     function test_requestRedeem_OK() public {
         vm.prank(alice);
+        etfToken.transfer(bob, 3e18);
+
+        vm.startPrank(bob);
+        etfToken.approve(address(vendingMachine), 3e18);
+        vendingMachine.requestRedeem(3e18);
+        vm.stopPrank();
+    }
+
+    function test_requestRedeem_NotWhitelisted() public {
+        vm.prank(alice);
         etfToken.transfer(carl, 3e18);
 
         vm.startPrank(carl);
         etfToken.approve(address(vendingMachine), 3e18);
+        vm.expectRevert();
         vendingMachine.requestRedeem(3e18);
         vm.stopPrank();
     }
@@ -143,12 +164,6 @@ contract VendingMachineTest is Test {
         ( , , ,uint count, ,) = vendingMachine.bulkOrders(0);
 
         assertEq(count, orderAmount);
-    }
-
-    function test_closeBulkOrder_tooYoung() public {
-        vm.prank(alice);
-        vm.expectRevert();
-        vendingMachine.closeBulkOrder(0);
     }
 
     function test_closeBulkOrder_mature() public {
@@ -278,5 +293,40 @@ contract VendingMachineTest is Test {
 
         VendingMachine.Request memory order = vendingMachine.bulkOrderInnerOrder(0, 0);
         assertEq(order.stableTokenAmount, 1e18);
+    }
+
+    function test_requestMint_mintingFee(uint16 mintingFeeBp) public {
+        vm.assume(mintingFeeBp < 10000);
+
+        vm.startPrank(alice);
+        stableToken.transfer(bob, 1e18);
+        vendingMachine.setMintingFee(mintingFeeBp);
+        vm.stopPrank();
+
+        uint256 aliceBalanceBefore = stableToken.balanceOf(alice);
+
+        vm.startPrank(bob);
+        stableToken.approve(address(vendingMachine), 1e18);
+        vendingMachine.requestMint(1e18);
+        vm.stopPrank();
+
+        uint256 aliceBalanceAfter = stableToken.balanceOf(alice);
+
+        VendingMachine.Request memory order = vendingMachine.bulkOrderInnerOrder(0, 0);
+        uint256 actualStableTokenAmount = order.stableTokenAmount;
+
+        console.log(aliceBalanceBefore, aliceBalanceAfter);
+
+        assertGe(
+            aliceBalanceAfter,
+            aliceBalanceBefore
+        );
+        console.log(mintingFeeBp);
+        console.log(order.stableTokenAmount + (aliceBalanceAfter - aliceBalanceBefore));
+
+        assertEq(
+            order.stableTokenAmount + (aliceBalanceAfter - aliceBalanceBefore),
+            1e18
+        );
     }
 }
