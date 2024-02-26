@@ -52,7 +52,6 @@ contract VendingMachine is AccessControl {
 
     mapping(uint256 => BulkOrder) public bulkOrders;
     uint256 public activeBulkOrder;
-    bool isBulkOrderActive = false;
 
     IERC20Upgradeable public stableToken;
     NumToken public etfToken;
@@ -87,13 +86,6 @@ contract VendingMachine is AccessControl {
     error FailedInternalTransfer();
     error AddressNotWhitelisted();
 
-    modifier onlyBulkOrderActive() {
-        if (!isBulkOrderActive) {
-            revert AddressNotWhitelisted();
-        }
-        _;
-    }
-
     modifier onlyWhitelisted(address who) {
         if (!mapper.isAddressWhitelisted(who)) {
           revert AddressNotWhitelisted();
@@ -112,7 +104,6 @@ contract VendingMachine is AccessControl {
         etfToken = _etfToken;
         feeWallet = _feeWallet;
         mapper = _mapper;
-        isBulkOrderActive = true;
         bulkOrders[activeBulkOrder].openedTimestamp = block.timestamp;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -161,7 +152,7 @@ contract VendingMachine is AccessControl {
      * Request a new Num ETF Token minting operation.
      * @dev This function also collects minting fees for the operation, and subtracts them from the reported stable token amount.
      */
-    function requestMint(uint256 stableTokenAmount) public onlyBulkOrderActive onlyWhitelisted(_msgSender()) {
+    function requestMint(uint256 stableTokenAmount) public onlyWhitelisted(_msgSender()) {
         uint256 mintFee = stableTokenAmount * mintingFeeBp / 10000;
 
         if (!stableToken.transferFrom(_msgSender(), address(this), stableTokenAmount - mintFee)) {
@@ -191,7 +182,7 @@ contract VendingMachine is AccessControl {
      *      i.e. if the redeemal fee is 2% and the resulting stable tokens from the sale are 100, 98 should get distributed to the redeemer.
      * @dev Burns the redeemed ETF tokens on the spot, since there were no discussions on the possibility of a bulk order "getting stuck" and ths requiring refunds directly from the contract. Operations can always refund by minting replacement tokens and sending them over.
      */
-    function requestRedeem(uint256 etfTokenAmount) public onlyBulkOrderActive onlyWhitelisted(_msgSender()) {
+    function requestRedeem(uint256 etfTokenAmount) public onlyWhitelisted(_msgSender()) {
         etfToken.burn(_msgSender(), etfTokenAmount);
 
         uint256 requestId = _queueRequest(Request({

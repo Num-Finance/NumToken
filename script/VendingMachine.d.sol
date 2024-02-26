@@ -34,6 +34,19 @@ contract VendingMachineDeploy is Script {
     }
 }
 
+contract VendingMachineAddManager is Script {
+  function run() public {
+    uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+
+    vm.startBroadcast(deployerPrivateKey);
+
+    VendingMachine vending = VendingMachine(0x17cB10FB5ea0d3c5084025F23643f7aD3d369Ef3);
+    vending.grantRole(vending.MANAGER_ROLE(), vm.envAddress("VENDING_ADMIN"));
+
+    vm.stopBroadcast();
+  }
+}
+
 contract ExtraVendingMachine is Script {
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
