@@ -1,14 +1,13 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+// SPDX-License-Identifier: Unlicensed
+pragma solidity ^0.8.22;
 
-import "./NumToken.sol";
-import "layerzero/token/oft/v2/OFTCoreV2.sol";
+/*import "./NumToken.sol";
+import "layerzero/oft/OFTCore.sol";
 
-
-contract LZNumToken is NumToken, OFTCoreV2 {
+contract LZNumToken is NumToken, OFTCore {
     uint internal ld2sdRate;
 
-    constructor(address _forwarder, address _endpoint) NumToken(_forwarder) OFTCoreV2(6, _endpoint) {}
+    constructor(address _forwarder, address _endpoint) NumToken(_forwarder) OFTCore(decimals(), _endpoint, _msgSender()) {}
 
     function _debitFrom(
         address _from,
@@ -34,4 +33,13 @@ contract LZNumToken is NumToken, OFTCoreV2 {
     function _ld2sdRate() internal view virtual returns (uint) {
         return ld2sdRate;
     }
-}
+
+    function token() external virtual view returns (address) {
+        return address(this);
+    }
+
+    funciton oftVersion() external pure returns (uint64 major, uint64 minor) {
+        major = 1;
+        minor = 1;
+    }
+}*/
