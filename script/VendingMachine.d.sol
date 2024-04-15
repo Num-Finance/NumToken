@@ -16,9 +16,9 @@ contract VendingMachineDeploy is Script {
 
         address payable defaultadmin = payable(vm.envAddress("DEFAULT_ADMIN_ROLE"));
 
-        NumToken usdc = NumToken(0xC1E1C0Ab645Bd3C3156b20953784992013FDa98d);
-        NumToken netf = NumToken(0xDF4DDe37bdbe76Ac7af1B068877C7901f254A211);
-        KYCMapper mapper = KYCMapper(0x6187067a11FeD469Db792546398Ef976cfE4a81f);
+        NumToken usdc = NumToken(0xecdd81146db6987F4825e1a8EAC20CC39a3cEB41);
+        NumToken netf = NumToken(0x69833E1a6c1CCF983E0dC3Aeac1B884052bb7E32);
+        KYCMapper mapper = KYCMapper(0xD2Da604dfFC934ADFa28A248f6a701eAcbdd7B4c);
 
         VendingMachine vending = new VendingMachine(
             usdc,
@@ -54,7 +54,7 @@ contract ExtraVendingMachine is Script {
 
         NumToken usdc = NumToken(0xC1E1C0Ab645Bd3C3156b20953784992013FDa98d);
         NumToken netf = NumToken(0x112250D431C3d71C2B60DF4804F9cE6CFB682921);
-        KYCMapper mapper = KYCMapper(0x6187067a11FeD469Db792546398Ef976cfE4a81f);
+        KYCMapper mapper = KYCMapper(0xD2Da604dfFC934ADFa28A248f6a701eAcbdd7B4c);
 
         VendingMachine vending = new VendingMachine(
             usdc,

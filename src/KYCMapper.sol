@@ -25,3 +25,10 @@ contract KYCMapper is AccessControl {
         emit WhitelistStatusChanged(who, whitelisted);
     }
 }
+
+contract FakeKYCMapper {
+    constructor() {}
+    function isAddressWhitelisted(address who) public pure returns (bool) {
+        return true;
+    }
+}

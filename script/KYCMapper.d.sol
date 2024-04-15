@@ -25,6 +25,19 @@ contract KYCMapperDeploy is Script {
     }
 }
 
+contract FakeKYCMapperDeploy is Script {
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        FakeKYCMapper mapper = new FakeKYCMapper();
+
+        console.log("Deployed fake mapper at", address(mapper));
+
+        vm.stopBroadcast();
+    }
+}
+
 contract KYCMapperAddAdmin is Script {
     function run() external {
         KYCMapper mapper = KYCMapper(0x6187067a11FeD469Db792546398Ef976cfE4a81f);
@@ -48,7 +61,7 @@ contract KYCMapperWhitelist is Script {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        mapper.setAddressWhitelisted(0x2Df60994237608260870584D5895Eb84b0614316, true);
+        mapper.setAddressWhitelisted(0xe094e0d6e5dD6BCf11F63e03fFa101Ba643565b2, true);
         vm.stopBroadcast();
     }
 }
