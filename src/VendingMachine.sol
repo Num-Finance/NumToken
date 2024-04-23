@@ -141,11 +141,11 @@ contract VendingMachine is AccessControl {
      */
     function _queueRequest(Request memory request) internal returns (uint256 index) {
         BulkOrder storage bulk = bulkOrders[activeBulkOrder];
+        index = bulk.requestCount;
 
         bulk.stableTokenReceived += request.stableTokenAmount;
         bulk.etfTokenReceived += request.etfTokenAmount;
         bulk.requests[bulk.requestCount++] = request;
-        index = bulk.requestCount;
     }
 
     /**
