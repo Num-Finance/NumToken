@@ -12,6 +12,7 @@ import "src/KYCMapper.sol";
  * @author Felipe Buiras
  * @dev This contract helps with the collection of buy/sell orders for Num ETF Tokens, which are executed by a human operator.
  * @dev Individual orders are collected into a usually daily "Bulk Order" and executed in batches.
+ * @dev **** THIS CONTRACT DOES NOT SUPPORT FEE-ON-TRANSFER TOKENS AS THE STABLE LEG ****
  */
 contract VendingMachine is AccessControl {
     /**
@@ -85,6 +86,7 @@ contract VendingMachine is AccessControl {
     error InvalidParameters();
     error FailedInternalTransfer();
     error AddressNotWhitelisted();
+    error InvalidMintFee();
 
     modifier onlyWhitelisted(address who) {
         if (!mapper.isAddressWhitelisted(who)) {
@@ -109,7 +111,6 @@ contract VendingMachine is AccessControl {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 
         _setupRole(MANAGER_ROLE, _managerWallet);
-        _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     /**
@@ -152,7 +153,10 @@ contract VendingMachine is AccessControl {
      * Request a new Num ETF Token minting operation.
      * @dev This function also collects minting fees for the operation, and subtracts them from the reported stable token amount.
      */
-    function requestMint(uint256 stableTokenAmount) public onlyWhitelisted(_msgSender()) {
+    function requestMint(uint256 stableTokenAmount, uint256 expectedMintFeeBp) public onlyWhitelisted(_msgSender()) {
+        if (mintingFeeBp > expectedMintFeeBp) {
+          revert InvalidMintFee();
+        }
         uint256 mintFee = stableTokenAmount * mintingFeeBp / 10000;
 
         if (!stableToken.transferFrom(_msgSender(), address(this), stableTokenAmount - mintFee)) {
@@ -211,7 +215,8 @@ contract VendingMachine is AccessControl {
      * Close the currently active bulk order, allowing an oeprator to begin the order filling process.
      * @dev This creates a new bulk order so that requests can still come in, but end up in the next one.
      */
-    function closeBulkOrder(uint256 bulkOrderId) public onlyRole(MANAGER_ROLE) {
+    function closeBulkOrder() public onlyRole(MANAGER_ROLE) {
+        uint256 bulkOrderId = activeBulkOrder;
         BulkOrder storage order = bulkOrders[bulkOrderId];
         if (order.state != BulkOrderState.OPEN) {
             revert InvalidBulkOrderStateTransition();

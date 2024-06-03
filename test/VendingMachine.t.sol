@@ -17,14 +17,10 @@ contract VendingMachineTest is Test {
     ERC20 stableToken;
     NumToken etfToken;
 
-    bytes32 alice_pk = keccak256("ALICE'S PRIVATE KEY");
-    bytes32 bob_pk   = keccak256("BOB'S PRIVATE KEY");
-    bytes32 carl_pk   = keccak256("CARL'S PRIVATE KEY");
-    bytes32 dani_pk   = keccak256("DANI'S PRIVATE KEY");
-    address alice    = vm.addr(uint256(alice_pk));
-    address bob      = vm.addr(uint256(bob_pk));
-    address carl     = vm.addr(uint256(carl_pk));
-    address dani     = vm.addr(uint256(dani_pk));
+    address alice    = address(0x00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa);
+    address bob      = address(0x00bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb);
+    address carl     = address(0x00cccccccccccccccccccccccccccccccccccccccc);
+    address dani     = address(0x00dddddddddddddddddddddddddddddddddddddddd);
 
     KYCMapper mapper = new KYCMapper();
 
@@ -71,7 +67,7 @@ contract VendingMachineTest is Test {
         vm.startPrank(bob);
 
         stableToken.approve(address(vendingMachine), 1e18);
-        vendingMachine.requestMint(1e18);
+        vendingMachine.requestMint(1e18, vendingMachine.mintingFeeBp());
 
         vm.stopPrank();
     }
@@ -83,8 +79,10 @@ contract VendingMachineTest is Test {
         vm.startPrank(carl);
 
         stableToken.approve(address(vendingMachine), 1e18);
+        uint256 expectedMintFee = vendingMachine.mintingFeeBp();
+
         vm.expectRevert();
-        vendingMachine.requestMint(1e18);
+        vendingMachine.requestMint(1e18, expectedMintFee);
 
         vm.stopPrank();
     }
@@ -93,8 +91,23 @@ contract VendingMachineTest is Test {
         vm.startPrank(bob);
 
         stableToken.approve(address(vendingMachine), 1e18);
+        uint256 expectedMintFee = vendingMachine.mintingFeeBp();
+
         vm.expectRevert();
-        vendingMachine.requestMint(1e18);
+        vendingMachine.requestMint(1e18, expectedMintFee);
+
+        vm.stopPrank();
+    }
+
+    function test_requestMint_FeeChanged() public {
+        vm.prank(alice);
+        stableToken.transfer(bob, 1e18);
+
+        vm.startPrank(bob);
+
+        stableToken.approve(address(vendingMachine), 1e18);
+        // NOTE: emulating expected mint fee to be zero
+        vendingMachine.requestMint(1e18, 0);
 
         vm.stopPrank();
     }
@@ -132,6 +145,7 @@ contract VendingMachineTest is Test {
         // NOTE: Request amount is bounded to ensure tests run fast.
         //       The contract actually has no logical limit on requests within bulk orders.
         vm.assume(orderAmount < 100);
+        uint256 expectedMintFee = vendingMachine.mintingFeeBp();
 
         vm.startPrank(bob);
         etfToken.approve(address(vendingMachine), 1e18);
@@ -153,7 +167,7 @@ contract VendingMachineTest is Test {
             ) {
                 stableToken.transfer(bob, 1);
                 vm.prank(bob);
-                vendingMachine.requestMint(1);
+                vendingMachine.requestMint(1, expectedMintFee);
             } else {
                 etfToken.transfer(bob, 1);
                 vm.prank(bob);
@@ -170,7 +184,7 @@ contract VendingMachineTest is Test {
         skip(1 days + 2 hours);
 
         vm.prank(alice);
-        vendingMachine.closeBulkOrder(0);
+        vendingMachine.closeBulkOrder();
 
         assertEq(vendingMachine.activeBulkOrder(), 1);
     }
@@ -189,7 +203,7 @@ contract VendingMachineTest is Test {
         vm.startPrank(bob);
         stableToken.approve(address(vendingMachine), tokenAmount);
         for (uint i = 0; i < orderAmount; i++) {
-            vendingMachine.requestMint(requestAmount);
+            vendingMachine.requestMint(requestAmount, vendingMachine.mintingFeeBp());
         }
         vm.stopPrank();
 
@@ -202,7 +216,7 @@ contract VendingMachineTest is Test {
         uint256 aliceBalanceBefore = stableToken.balanceOf(alice);
 
         vm.prank(alice);
-        vendingMachine.closeBulkOrder(0);
+        vendingMachine.closeBulkOrder();
 
         uint256 aliceBalanceAfter = stableToken.balanceOf(alice);
 
@@ -226,7 +240,7 @@ contract VendingMachineTest is Test {
         vm.startPrank(bob);
         stableToken.approve(address(vendingMachine), tokenAmount);
         for (uint i = 0; i < orderAmount; i++) {
-            vendingMachine.requestMint(requestAmount);
+            vendingMachine.requestMint(requestAmount, vendingMachine.mintingFeeBp());
         }
         vm.stopPrank();
 
@@ -237,10 +251,10 @@ contract VendingMachineTest is Test {
         // NOTE: Check bob can't close the bulk order himself.
         vm.expectRevert();
         vm.prank(bob);
-        vendingMachine.closeBulkOrder(0);
+        vendingMachine.closeBulkOrder();
 
         vm.startPrank(alice);
-        vendingMachine.closeBulkOrder(0);
+        vendingMachine.closeBulkOrder();
         // NOTE: This function call triggers offchain processes that actually acquire
         //       the underlying assets. The contract has no way of knowing this has effectively happened.
         //       Please refer to our internal operations manual.
@@ -282,13 +296,38 @@ contract VendingMachineTest is Test {
         // END OF USECASE
     }
 
+    function test_closeBulkOrder_unauthorized() public {
+        vm.prank(carl);
+        vm.expectRevert();
+        vendingMachine.closeBulkOrder();
+    }
+
+    function test_mintForBulkOrder_unauthorized() public {
+        vm.prank(alice);
+        vendingMachine.closeBulkOrder();
+        vm.prank(carl);
+        vm.expectRevert();
+        vendingMachine.mintForBulkOrder(0, 1e18);
+    }
+
+    function test_markBulkOrderFulfilled_unauthorized() public {
+        vm.startPrank(alice);
+        vendingMachine.closeBulkOrder();
+        vendingMachine.mintForBulkOrder(0, 1);
+        vm.stopPrank();
+
+        vm.prank(carl);
+        vm.expectRevert();
+        vendingMachine.markBulkOrderFulfilled(0);
+    }
+
     function test_bulkOrderInnerOrder() public {
         vm.prank(alice);
         stableToken.transfer(bob, 1e18);
 
         vm.startPrank(bob);
         stableToken.approve(address(vendingMachine), 1e18);
-        vendingMachine.requestMint(1e18);
+        vendingMachine.requestMint(1e18, vendingMachine.mintingFeeBp());
         vm.stopPrank();
 
         VendingMachine.Request memory order = vendingMachine.bulkOrderInnerOrder(0, 0);
@@ -307,7 +346,7 @@ contract VendingMachineTest is Test {
 
         vm.startPrank(bob);
         stableToken.approve(address(vendingMachine), 1e18);
-        vendingMachine.requestMint(1e18);
+        vendingMachine.requestMint(1e18, vendingMachine.mintingFeeBp());
         vm.stopPrank();
 
         uint256 aliceBalanceAfter = stableToken.balanceOf(alice);
@@ -328,5 +367,25 @@ contract VendingMachineTest is Test {
             order.stableTokenAmount + (aliceBalanceAfter - aliceBalanceBefore),
             1e18
         );
+    }
+
+    function test_requestMint_feeChanged() public {
+        vm.startPrank(alice);
+        stableToken.transfer(bob, 1e18);
+        vendingMachine.setMintingFee(0);
+        vm.stopPrank();
+
+        uint256 expectedMintFee = vendingMachine.mintingFeeBp();
+
+        vm.prank(bob);
+        stableToken.approve(address(vendingMachine), 1e18);
+
+        // NOTE: simulated front-running by alice
+        vm.prank(alice);
+        vendingMachine.setMintingFee(10000);
+
+        vm.prank(bob);
+        vm.expectRevert();
+        vendingMachine.requestMint(1e18, expectedMintFee);
     }
 }
