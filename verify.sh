@@ -15,8 +15,7 @@ forge verify-contract \
         "$forwarder" \
     )\
     $impl \
-    src/NumToken.sol:NumToken \
-    $ETHERSCAN_API_KEY
+    src/NumToken.sol:NumToken
 
 forge verify-contract \
     --chain-id $chainid \
@@ -27,8 +26,7 @@ forge verify-contract \
         "$impl" \
     ) \
     $beacon \
-    lib/openzeppelin-contracts/contracts/proxy/beacon/UpgradeableBeacon.sol:UpgradeableBeacon \
-    $ETHERSCAN_API_KEY
+    lib/openzeppelin-contracts/contracts/proxy/beacon/UpgradeableBeacon.sol:UpgradeableBeacon
 
 forge verify-contract \
     --chain-id $chainid \
@@ -40,5 +38,4 @@ forge verify-contract \
         "" \
     ) \
     $proxy \
-    lib/openzeppelin-contracts/contracts/proxy/beacon/BeaconProxy.sol:BeaconProxy \
-    $ETHERSCAN_API_KEY
+    lib/openzeppelin-contracts/contracts/proxy/beacon/BeaconProxy.sol:BeaconProxy

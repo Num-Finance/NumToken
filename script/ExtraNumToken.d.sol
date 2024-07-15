@@ -21,7 +21,7 @@ contract NumTokenDeploy is Script {
             ));
             string memory BeaconJson = string(vm.readFile(jsonPath));
 
-            beacon = abi.decode(vm.parseJson(BeaconJson, "transactions[1].contractAddress"), (address));
+            beacon = abi.decode(vm.parseJson(BeaconJson, ".transactions[1].contractAddress"), (address));
         }
 
         BeaconProxy tokenProxy = new BeaconProxy(
@@ -73,12 +73,6 @@ contract NumTokenDeploy is Script {
         token.grantRole(
             token.DEFAULT_ADMIN_ROLE(),
             defaultadmin
-        );
-
-
-        token.renounceRole(
-            token.DEFAULT_ADMIN_ROLE(),
-            vm.addr(deployerPrivateKey)
         );
 
         vm.stopBroadcast();
