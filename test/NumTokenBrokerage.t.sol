@@ -167,4 +167,48 @@ contract NumTokenBrokerageTest is Test {
             2 ether
         );
     }
+
+    function testBuyGem_asymmetric_tout() public {
+        //revert("todo!");
+        oracle.setResponse(0.2 ether);
+        psm.file("line", type(uint256).max);
+        // NOTE: 1% tout
+        psm.file("tout", 0.01 ether);
+
+        // NOTE: fund the contract
+        counterpart.approve(address(psm), 100 ether);
+        psm.sellGem(address(this), 100 ether);
+        
+        uint256 balanceBefore = counterpart.balanceOf(address(this));
+        
+        // NOTE price = 0.2, sell 10 get 2
+        ntst.approve(address(psm), 10 ether);
+        psm.buyGem(address(this), 10 ether);
+
+        uint256 balanceAfter = counterpart.balanceOf(address(this));
+
+        assertEq(
+            balanceAfter - balanceBefore,
+            1.98 ether
+        );
+    }
+
+    function testSellGem_asymmetric_tin() public {
+        oracle.setResponse(0.2 ether);
+        psm.file("line", type(uint256).max);
+        psm.file("tin", 0.01 ether);
+
+        uint256 balanceBefore = ntst.balanceOf(address(this));
+
+        // NOTE: price = 0.2 buy with 10, get 50 (1/0.2 = 5)
+        counterpart.approve(address(psm), 10 ether);
+        psm.sellGem(address(this), 10 ether);
+
+        uint256 balanceAfter = ntst.balanceOf(address(this));
+
+        assertEq(
+            balanceAfter - balanceBefore,
+            49.5 ether
+        );
+    }
 }
