@@ -23,6 +23,7 @@ interface IFunctionsConsumer {
 /**
  * @dev This contract is a reimplementation/repurposing of MakerDAO's DssPsm
  *      interface for Num's simpler Num Stable Token system.
+ * @author Felipe Buiras
  */
 contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     uint256 public constant ONE = 10 ** 18;
@@ -58,18 +59,33 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
         _;
     }
 
+    /**
+     * @notice Add an address to the authorized list that may change
+     *         contract parameters
+     * @param usr address -- address to be added to the admin group
+     */
     function rely(
         address usr
     ) external override onlyRole(BROKERAGE_ADMIN_ROLE) {
         _grantRole(BROKERAGE_ADMIN_ROLE, usr);
     }
 
+    /**
+     * @notice Remove an address from the authorized list that may change
+     *         contract parameters
+     * @param usr address -- address to be removed from the admin group
+     */
     function deny(
         address usr
     ) external override onlyRole(BROKERAGE_ADMIN_ROLE) {
         _revokeRole(BROKERAGE_ADMIN_ROLE, usr);
     }
 
+    /**
+     * @notice Change contract parameters
+     * @param what bytes32 -- The key to change
+     * @param data uint256 -- The value to set
+     */
     function file(
         bytes32 what,
         uint256 data
@@ -97,25 +113,38 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
         return uint256(bytes32(oracle.s_lastResponse()));
     }
 
+    /**
+     * @notice Preview a sellGem operation, returning the nStable amount
+     *         that would be acquired.
+     * @param gemAmt uint256 -- Amount of the counterpart token that would be
+     *         sold
+     * @return uint256 -- Amout of nStables that would be acquired
+     */
     function previewSellGem(uint256 gemAmt) public view returns (uint256) {
         require(tin < ONE, "NumTokenBrokerage: tin must be less than ONE");
         return (
             (gemAmt * to18ConversionFactor) * ONE / price() * (ONE - tin) / ONE
         );
-        //return ((gemAmt * to18ConversionFactor * price()) / ONE) * (ONE - tin) / ONE;
     }
 
+    /**
+     * @notice Preview a buyGem operation, returning the amount
+     *         of counterpart tokens that would be acquired.
+     * @param numAmount uint256 -- Amount of the nStable token that would be
+     *         sold
+     * @return uint256 -- Amout of counterpart tokens that would be acquired
+     */
     function previewBuyGem(uint256 numAmount) public view returns (uint256) {
         require(tout < ONE, "NumTokenBrokerage: tout must be less than ONE");
         return (
             numAmount * price() / ONE / to18ConversionFactor * (ONE - tout) / ONE
         );
-        //return
-         //   ((numAmount * ONE) / price()) * (ONE - tout) * to18ConversionFactor;
     }
 
     /**
      * @notice Sell counterpart tokens for Num Tokens
+     * @param usr address -- the address that will receive the tokens
+     * @params gemAmt uint256 -- the amount of counterpart tokens to sell
      */
     function sellGem(address usr, uint256 gemAmt) external override notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
@@ -131,6 +160,8 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
 
     /**
      * @notice Buy counterpart tokens with Num Tokens
+     * @param usr address -- the address that will receive the tokens
+     * @params numAmount uint256 -- the amount of nStable tokens to sell
      */
     function buyGem(
         address usr,
@@ -146,6 +177,12 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
         );
     }
 
+    /**
+     * @notice Take counterpart tokens out of the brokerage contract
+     * @dev this function can only be called by administrators
+     * @param to address -- address that will receive the tokens
+     * @param amount uint256 -- amount of counterpart tokens to withdraw
+     */
     function take(
         address to,
         uint256 amount
@@ -160,6 +197,12 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
         );
     }
 
+    /**
+     * @notice Return counterpart tokens to the brokerage contract
+     * @param amount uint256 -- amount of counterpart tokens to deposit
+     * @dev this function is left external since we don't care about unauthorized
+     *      addresses sending counterpart tokens to this contract
+     */
     function give(uint256 amount) external {
         require(
             counterpart.transferFrom(msg.sender, address(this), amount),
