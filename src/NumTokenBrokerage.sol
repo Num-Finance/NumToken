@@ -154,7 +154,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
             numAmount * price() / ONE / to18ConversionFactor * (ONE - tout) / ONE
         );
     }
-n
+
     /**
      * @notice Sell counterpart tokens for Num Tokens
      * @param usr the address that will receive the tokens
