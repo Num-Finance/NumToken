@@ -2,6 +2,7 @@
 pragma solidity ^0.8.22;
 
 import "./NumToken.sol";
+import "./PriceProvider.sol";
 import {IERC20Metadata as IERC20} from "openzeppelin/token/ERC20/extensions/IERC20Metadata.sol";
 import "openzeppelin/access/AccessControl.sol";
 import "forge-std/console.sol";
@@ -14,10 +15,6 @@ interface IDssTokenBrokerage {
 
     function tin() external view returns (uint256);
     function tout() external view returns (uint256);
-}
-
-interface IFunctionsConsumer {
-    function s_lastResponse() external view returns (bytes memory);
 }
 
 /**
@@ -37,8 +34,8 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     /// @notice counterpart token for this contract
     IERC20 public immutable counterpart;
 
-    /// @notice Chainlink functions consumer contract that provides price data
-    IFunctionsConsumer public immutable oracle;
+    /// @notice Price provider contract
+    PriceProvider public oracle;
 
     /// @notice sellGem tax. Defined as (1 ether) = 100%
     uint256 public tin = 0;
@@ -58,7 +55,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     constructor(
         NumToken _token,
         IERC20 _counterpart,
-        IFunctionsConsumer _oracle
+        PriceProvider _oracle
     ) AccessControl() {
         token = _token;
         counterpart = _counterpart;
@@ -120,11 +117,11 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     }
 
     /**
-     * @notice Get the current price reported by the Chainlink oracle
-     * @dev the Chainlink Functions contract returns the price of the nStable expressed in USD.
+     * @notice Get the current price reported by the PriceProvider contracxt
+     * @dev the contract returns the price of the nStable expressed in USD.
      */
     function price() public view returns (uint256) {
-        return uint256(bytes32(oracle.s_lastResponse()));
+        return oracle.getPrice();
     }
 
     /**
