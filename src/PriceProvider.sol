@@ -36,7 +36,7 @@ contract PriceProvider is Initializable, OwnableUpgradeable, IPriceProvider {
     }
 
     function getPrice() public virtual view returns (uint256) {
-        if (consumer.latestTimestamp() < block.timestamp - timeTolerance) revert SourceDataStale();
+        if (consumer.latestTimestamp() + timeTolerance > block.timestamp) revert SourceDataStale();
         return uint256(bytes32(consumer.s_lastResponse()));
     }
 
@@ -96,7 +96,7 @@ contract PriceProviderV2 is PriceProvider {
         if (!source.enabled) return (Error.SourceDisabled, 0);
 
         IFunctionsConsumer consumer = IFunctionsConsumer(source.source);
-        if (consumer.latestTimestamp() < block.timestamp - timeTolerance) return (Error.SourceDataStale, 0);
+        if (consumer.latestTimestamp() + timeTolerance > block.timestamp) return (Error.SourceDataStale, 0);
 
         return (Error.NoError, uint256(bytes32(consumer.s_lastResponse())));
     }
@@ -107,7 +107,7 @@ contract PriceProviderV2 is PriceProvider {
 
         IChronicle feed = IChronicle(source.source);
         (uint256 val, uint256 age) = feed.readWithAge();
-        if (age < block.timestamp - timeTolerance) return (Error.SourceDataStale, 0);
+        if (age + timeTolerance > block.timestamp) return (Error.SourceDataStale, 0);
 
         return (Error.NoError, val);
     }
