@@ -42,12 +42,12 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     PriceProvider public oracle;
 
     /// @notice sellGem tax. Defined as (1 ether) = 100%
-    uint256 public tin = 0;
+    uint256 _tin = 0;
     uint256 timelockedTin = 0;
     uint256 timelockedTinApplies = type(uint256).max;
 
     /// @notice buyGem tax. Defined as (1 ether) = 100%
-    uint256 public tout = 0;
+    uint256 _tout = 0;
     uint256 timelockedTout = 0;
     uint256 timelockedToutApplies = type(uint256).max;
 
@@ -117,7 +117,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     function file(
         bytes32 what,
         uint256 data
-    ) external onlyRole(BROKERAGE_ADMIN_ROLE) {
+    ) external checkTimelocks onlyRole(BROKERAGE_ADMIN_ROLE) {
         if (what == "tin") {
             if (data >= ONE) {
                 revert InvalidFileData();
@@ -154,20 +154,36 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
         return oracle.getPrice();
     }
 
+    function tin() public view returns (uint256) {
+        if (timelockedTinApplies < block.timestamp) {
+            return timelockedTin;
+        } else {
+            return _tin;
+        }
+    }
+
+    function tout() public view returns (uint256) {
+        if (timelockedToutApplies < block.timestamp) {
+            return timelockedTout;
+        } else {
+            return _tout;
+        }
+    }
+
     /**
      * @notice Check the timelocks before doing calculations and update values
      *         if necessary.
      */
     modifier checkTimelocks() {
         if (timelockedTinApplies > block.timestamp) {
-            tin = timelockedTin;
+            _tin = timelockedTin;
             timelockedTinApplies = type(uint256).max;
-            emit FileChanged("tin", tin);
+            emit FileChanged("tin", _tin);
         }
         if (timelockedToutApplies > block.timestamp) {
-            tout = timelockedTout;
+            _tout = timelockedTout;
             timelockedToutApplies = type(uint256).max;
-            emit FileChanged("tout", tout);
+            emit FileChanged("tout", _tout);
         }
         _;
     }
@@ -179,9 +195,9 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      *         sold
      * @return Amount of nStables that would be acquired
      */
-    function previewSellGem(uint256 gemAmt) public view checkTimelocks returns (uint256) {
+    function previewSellGem(uint256 gemAmt) public view returns (uint256) {
         return (
-            (gemAmt * to18ConversionFactor) * ONE / price() * (ONE - tin) / ONE
+            (gemAmt * to18ConversionFactor) * ONE / price() * (ONE - tin()) / ONE
         );
     }
 
@@ -192,9 +208,9 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      *         sold
      * @return Amount of counterpart tokens that would be acquired
      */
-    function previewBuyGem(uint256 numAmount) public view checkTimelocks returns (uint256) {
+    function previewBuyGem(uint256 numAmount) public view returns (uint256) {
         return (
-            numAmount * price() / ONE / to18ConversionFactor * (ONE - tout) / ONE
+            numAmount * price() / ONE / to18ConversionFactor * (ONE - tout()) / ONE
         );
     }
 
@@ -203,7 +219,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      * @param usr the address that will receive the tokens
      * @param gemAmt the amount of counterpart tokens to sell
      */
-    function sellGem(address usr, uint256 gemAmt) external override nonReentrant notStopped {
+    function sellGem(address usr, uint256 gemAmt) external override checkTimelocks nonReentrant notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
         counterpart.safeTransferFrom(usr, address(this), gemAmt);
         uint256 numAmount = previewSellGem(gemAmt);
@@ -220,7 +236,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     function buyGem(
         address usr,
         uint256 numAmount
-    ) external override nonReentrant notStopped {
+    ) external override checkTimelocks nonReentrant notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
         token.burn(usr, numAmount);
         uint256 gemAmount = previewBuyGem(numAmount);
