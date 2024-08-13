@@ -43,9 +43,13 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
 
     /// @notice sellGem tax. Defined as (1 ether) = 100%
     uint256 public tin = 0;
+    uint256 timelockedTin = 0;
+    uint256 timelockedTinApplies = type(uint256).max;
 
     /// @notice buyGem tax. Defined as (1 ether) = 100%
     uint256 public tout = 0;
+    uint256 timelockedTout = 0;
+    uint256 timelockedToutApplies = type(uint256).max;
 
     /// @notice the debt ceiling of this contract - cannot emit more than this figure
     uint256 public line = 0;
@@ -55,6 +59,15 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
 
     /// @notice whether this contract is operational at this time
     bool public stop = false;
+
+    /// @notice how much time a tin/tout file needs to wait before it is applied
+    uint256 timelock = 0;
+
+    error InvalidFileKey();
+    error InvalidFileData();
+
+    event FileChangeStaged(bytes32 indexed what, uint256 value);
+    event FileChanged(bytes32 indexed what, uint256 value);
 
     constructor(
         NumToken _token,
@@ -106,17 +119,30 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
         uint256 data
     ) external onlyRole(BROKERAGE_ADMIN_ROLE) {
         if (what == "tin") {
-            require(data < ONE, "NumTokenBrokerage: Invalid value");
-            tin = data;
+            if (data >= ONE) {
+                revert InvalidFileData();
+            }
+            timelockedTin = data;
+            timelockedTinApplies = block.timestamp + timelock;
+            emit FileChangeStaged(what, data);
         } else if (what == "tout") {
-            require(data < ONE, "NumTokenBrokerage: Invalid value");
-            tout = data;
+            if (data >= ONE) {
+                revert InvalidFileData();
+            }
+            timelockedTout = data;
+            timelockedToutApplies = block.timestamp + timelock;
+            emit FileChangeStaged(what, data);
         } else if (what == "line") {
+            emit FileChanged(what, data);
             line = data;
         } else if (what == "stop") {
             stop = data != 0;
+            emit FileChanged(what, data);
+        } else if (what == "lock") {
+            timelock = data;
+            emit FileChanged(what, data);
         } else {
-            revert("NumTokenBrokerage: Invalid file");
+            revert InvalidFileKey();
         }
     }
 
@@ -129,14 +155,31 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     }
 
     /**
+     * @notice Check the timelocks before doing calculations and update values
+     *         if necessary.
+     */
+    modifier checkTimelocks() {
+        if (timelockedTinApplies > block.timestamp) {
+            tin = timelockedTin;
+            timelockedTinApplies = type(uint256).max;
+            emit FileChanged("tin", tin);
+        }
+        if (timelockedToutApplies > block.timestamp) {
+            tout = timelockedTout;
+            timelockedToutApplies = type(uint256).max;
+            emit FileChanged("tout", tout);
+        }
+        _;
+    }
+
+    /**
      * @notice Preview a sellGem operation, returning the nStable amount
      *         that would be acquired.
      * @param gemAmt Amount of the counterpart token that would be
      *         sold
      * @return Amount of nStables that would be acquired
      */
-    function previewSellGem(uint256 gemAmt) public view returns (uint256) {
-        require(tin < ONE, "NumTokenBrokerage: tin must be less than ONE");
+    function previewSellGem(uint256 gemAmt) public view checkTimelocks returns (uint256) {
         return (
             (gemAmt * to18ConversionFactor) * ONE / price() * (ONE - tin) / ONE
         );
@@ -149,8 +192,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      *         sold
      * @return Amount of counterpart tokens that would be acquired
      */
-    function previewBuyGem(uint256 numAmount) public view returns (uint256) {
-        require(tout < ONE, "NumTokenBrokerage: tout must be less than ONE");
+    function previewBuyGem(uint256 numAmount) public view checkTimelocks returns (uint256) {
         return (
             numAmount * price() / ONE / to18ConversionFactor * (ONE - tout) / ONE
         );
