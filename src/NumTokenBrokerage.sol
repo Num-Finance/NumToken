@@ -77,7 +77,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      */
     function rely(
         address usr
-    ) external override onlyRole(BROKERAGE_ADMIN_ROLE) {
+    ) external override onlyRole(DEFAULT_ADMIN_ROLE) {
         _grantRole(BROKERAGE_ADMIN_ROLE, usr);
     }
 
@@ -88,7 +88,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      */
     function deny(
         address usr
-    ) external override onlyRole(BROKERAGE_ADMIN_ROLE) {
+    ) external override onlyRole(DEFAULT_ADMIN_ROLE) {
         _revokeRole(BROKERAGE_ADMIN_ROLE, usr);
     }
 
