@@ -3,7 +3,8 @@ pragma solidity ^0.8.22;
 
 import "./NumToken.sol";
 import "./PriceProvider.sol";
-import {IERC20Metadata as IERC20} from "openzeppelin/token/ERC20/extensions/IERC20Metadata.sol";
+import "openzeppelin/token/ERC20/utils/SafeERC20.sol";
+import "openzeppelin/token/ERC20/extensions/IERC20Metadata.sol";
 import "openzeppelin/access/AccessControl.sol";
 import "openzeppelin/security/ReentrancyGuard.sol";
 
@@ -23,6 +24,9 @@ interface IDssTokenBrokerage {
  * @author Felipe Buiras
  */
 contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage {
+    using SafeERC20 for NumToken;
+    using SafeERC20 for IERC20Metadata;
+
     uint256 public constant ONE = 10 ** 18;
     bytes32 public constant BROKERAGE_ADMIN_ROLE =
         keccak256("BROKERAGE_ADMIN_ROLE");
@@ -32,7 +36,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     NumToken public immutable token;
 
     /// @notice counterpart token for this contract
-    IERC20 public immutable counterpart;
+    IERC20Metadata public immutable counterpart;
 
     /// @notice Price provider contract
     PriceProvider public oracle;
@@ -54,7 +58,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
 
     constructor(
         NumToken _token,
-        IERC20 _counterpart,
+        IERC20Metadata _counterpart,
         PriceProvider _oracle
     ) AccessControl() ReentrancyGuard() {
         token = _token;
@@ -159,10 +163,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      */
     function sellGem(address usr, uint256 gemAmt) external override nonReentrant notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
-        require(
-            counterpart.transferFrom(usr, address(this), gemAmt),
-            "NumTokenBrokerage: Transfer failed"
-        );
+        counterpart.safeTransferFrom(usr, address(this), gemAmt);
         uint256 numAmount = previewSellGem(gemAmt);
         debt += numAmount;
         require(debt <= line, "NumTokenBrokerage: Debt ceiling reached");
@@ -182,10 +183,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
         token.burn(usr, numAmount);
         uint256 gemAmount = previewBuyGem(numAmount);
         debt -= numAmount;
-        require(
-            counterpart.transfer(usr, gemAmount),
-            "NumTokenBrokerage: Transfer failed"
-        );
+        counterpart.safeTransfer(usr, gemAmount);
     }
 
     /**
@@ -202,10 +200,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
             amount <= counterpart.balanceOf(address(this)),
             "NumTokenBrokerage: Insufficient balance"
         );
-        require(
-            counterpart.transfer(to, amount),
-            "NumTokenBrokerage: Transfer failed"
-        );
+        counterpart.safeTransfer(to, amount);
     }
 
     /**
@@ -215,9 +210,6 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      *      addresses sending counterpart tokens to this contract
      */
     function give(uint256 amount) nonReentrant external {
-        require(
-            counterpart.transferFrom(msg.sender, address(this), amount),
-            "NumTokenBrokerage: Transfer failed"
-        );
+        counterpart.safeTransferFrom(msg.sender, address(this), amount);
     }
 }
