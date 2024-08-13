@@ -102,10 +102,10 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
         uint256 data
     ) external onlyRole(BROKERAGE_ADMIN_ROLE) {
         if (what == "tin") {
-            require(data <= ONE, "NumTokenBrokerage: Invalid value");
+            require(data < ONE, "NumTokenBrokerage: Invalid value");
             tin = data;
         } else if (what == "tout") {
-            require(data <= ONE, "NumTokenBrokerage: Invalid value");
+            require(data < ONE, "NumTokenBrokerage: Invalid value");
             tout = data;
         } else if (what == "line") {
             line = data;
