@@ -5,7 +5,7 @@ import "./NumToken.sol";
 import "./PriceProvider.sol";
 import {IERC20Metadata as IERC20} from "openzeppelin/token/ERC20/extensions/IERC20Metadata.sol";
 import "openzeppelin/access/AccessControl.sol";
-import "forge-std/console.sol";
+import "openzeppelin/security/ReentrancyGuard.sol";
 
 interface IDssTokenBrokerage {
     function sellGem(address usr, uint256 gemAmt) external;
@@ -22,7 +22,7 @@ interface IDssTokenBrokerage {
  *      interface for Num's simpler Num Stable Token system.
  * @author Felipe Buiras
  */
-contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
+contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage {
     uint256 public constant ONE = 10 ** 18;
     bytes32 public constant BROKERAGE_ADMIN_ROLE =
         keccak256("BROKERAGE_ADMIN_ROLE");
@@ -56,7 +56,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
         NumToken _token,
         IERC20 _counterpart,
         PriceProvider _oracle
-    ) AccessControl() {
+    ) AccessControl() ReentrancyGuard() {
         token = _token;
         counterpart = _counterpart;
         oracle = _oracle;
@@ -157,7 +157,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
      * @param usr the address that will receive the tokens
      * @param gemAmt the amount of counterpart tokens to sell
      */
-    function sellGem(address usr, uint256 gemAmt) external override notStopped {
+    function sellGem(address usr, uint256 gemAmt) external override nonReentrant notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
         require(
             counterpart.transferFrom(usr, address(this), gemAmt),
@@ -177,7 +177,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     function buyGem(
         address usr,
         uint256 numAmount
-    ) external override notStopped {
+    ) external override nonReentrant notStopped {
         require(usr == msg.sender, "NumTokenBrokerage: Unauthorized");
         token.burn(usr, numAmount);
         uint256 gemAmount = previewBuyGem(numAmount);
@@ -197,7 +197,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
     function take(
         address to,
         uint256 amount
-    ) external onlyRole(BROKERAGE_ADMIN_ROLE) {
+    ) external nonReentrant onlyRole(BROKERAGE_ADMIN_ROLE) {
         require(
             amount <= counterpart.balanceOf(address(this)),
             "NumTokenBrokerage: Insufficient balance"
@@ -214,7 +214,7 @@ contract NumTokenBrokerage is AccessControl, IDssTokenBrokerage {
      * @dev this function is left external since we don't care about unauthorized
      *      addresses sending counterpart tokens to this contract
      */
-    function give(uint256 amount) external {
+    function give(uint256 amount) nonReentrant external {
         require(
             counterpart.transferFrom(msg.sender, address(this), amount),
             "NumTokenBrokerage: Transfer failed"
