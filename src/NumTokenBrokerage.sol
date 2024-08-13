@@ -21,6 +21,8 @@ interface IDssTokenBrokerage {
 /**
  * @dev This contract is a reimplementation/repurposing of MakerDAO's DssPsm
  *      interface for Num's simpler Num Stable Token system.
+ * @notice This contract **DOES NOT** take part in the Numun Stable Tokens
+ *         collateralization.
  * @author Felipe Buiras
  */
 contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage {
