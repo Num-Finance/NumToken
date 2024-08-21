@@ -114,7 +114,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     }
 
     function timelock() public view returns(uint256) {
-        if (timelockedLock <= block.timestamp) {
+        if (timelockedLockApplies <= block.timestamp) {
             return timelockedLock;
         } else {
             return _timelock;
