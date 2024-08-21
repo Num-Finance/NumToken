@@ -285,14 +285,22 @@ contract NumTokenBrokerageTest is Test {
     }
 
     function test_timelock_lock() public {
-        uint256 lockBefore = psm.timelock();
+        // NOTE: Wed Aug 21 18:46:35 -03 2024
+        vm.warp(1724276786);
 
+        // NOTE: set timelock to test whether the timelock applies to the timelock itself
         psm.file("lock", 5 minutes);
+        uint256 lockBefore = psm.timelock();
+        assertEq(lockBefore, 5 minutes);
+        skip(5 minutes);
+
+        // NOTE: after setting the timelock here, we have to wait for the older timelock to apply
+        psm.file("lock", 10 minutes);
         assertEq(psm.timelock(), lockBefore);
         skip(2 minutes);
         assertEq(psm.timelock(), lockBefore);
         skip(3 minutes);
-        assertEq(psm.timelock(), 5 minutes);
+        assertEq(psm.timelock(), 10 minutes);
     }
 
     function test_timelock_tin_tout() public {
