@@ -2,7 +2,7 @@
 pragma solidity ^0.8.22;
 
 import "./NumToken.sol";
-import "./PriceProvider.sol";
+import "./pricing/interfaces/IPriceProvider.sol";
 import "openzeppelin/token/ERC20/utils/SafeERC20.sol";
 import "openzeppelin/token/ERC20/extensions/IERC20Metadata.sol";
 import "openzeppelin/access/AccessControl.sol";
@@ -41,17 +41,17 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     IERC20Metadata public immutable counterpart;
 
     /// @notice Price provider contract
-    PriceProvider public oracle;
+    IPriceProvider public oracle;
 
     /// @notice sellGem tax. Defined as (1 ether) = 100%
     uint256 _tin = 0;
-    uint256 timelockedTin = 0;
-    uint256 timelockedTinApplies = type(uint256).max;
+    uint256 public timelockedTin = 0;
+    uint256 public timelockedTinApplies = type(uint256).max;
 
     /// @notice buyGem tax. Defined as (1 ether) = 100%
     uint256 _tout = 0;
-    uint256 timelockedTout = 0;
-    uint256 timelockedToutApplies = type(uint256).max;
+    uint256 public timelockedTout = 0;
+    uint256 public timelockedToutApplies = type(uint256).max;
 
     /// @notice the debt ceiling of this contract - cannot emit more than this figure
     uint256 public line = 0;
@@ -63,7 +63,9 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     bool public stop = false;
 
     /// @notice how much time a tin/tout file needs to wait before it is applied
-    uint256 timelock = 0;
+    uint256 public _timelock = 0;
+    uint256 public timelockedLock = 0;
+    uint256 public timelockedLockApplies = type(uint256).max;
 
     error InvalidFileKey();
     error InvalidFileData();
@@ -74,7 +76,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     constructor(
         NumToken _token,
         IERC20Metadata _counterpart,
-        PriceProvider _oracle
+        IPriceProvider _oracle
     ) AccessControl() ReentrancyGuard() {
         token = _token;
         counterpart = _counterpart;
@@ -111,6 +113,14 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
         _revokeRole(BROKERAGE_ADMIN_ROLE, usr);
     }
 
+    function timelock() public view returns(uint256) {
+        if (timelockedLock <= block.timestamp) {
+            return timelockedLock;
+        } else {
+            return _timelock;
+        }
+    }
+
     /**
      * @notice Change contract parameters
      * @param what The key to change
@@ -125,14 +135,14 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
                 revert InvalidFileData();
             }
             timelockedTin = data;
-            timelockedTinApplies = block.timestamp + timelock;
+            timelockedTinApplies = block.timestamp + timelock();
             emit FileChangeStaged(what, data);
         } else if (what == "tout") {
             if (data >= ONE) {
                 revert InvalidFileData();
             }
             timelockedTout = data;
-            timelockedToutApplies = block.timestamp + timelock;
+            timelockedToutApplies = block.timestamp + timelock();
             emit FileChangeStaged(what, data);
         } else if (what == "line") {
             emit FileChanged(what, data);
@@ -141,8 +151,9 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
             stop = data != 0;
             emit FileChanged(what, data);
         } else if (what == "lock") {
-            timelock = data;
-            emit FileChanged(what, data);
+            timelockedLock = data;
+            timelockedLockApplies = block.timestamp + timelock();
+            emit FileChangeStaged(what, data);
         } else {
             revert InvalidFileKey();
         }
@@ -157,7 +168,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     }
 
     function tin() public view returns (uint256) {
-        if (timelockedTinApplies < block.timestamp) {
+        if (timelockedTinApplies <= block.timestamp) {
             return timelockedTin;
         } else {
             return _tin;
@@ -165,7 +176,7 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
     }
 
     function tout() public view returns (uint256) {
-        if (timelockedToutApplies < block.timestamp) {
+        if (timelockedToutApplies <= block.timestamp) {
             return timelockedTout;
         } else {
             return _tout;
@@ -177,15 +188,20 @@ contract NumTokenBrokerage is ReentrancyGuard, AccessControl, IDssTokenBrokerage
      *         if necessary.
      */
     modifier checkTimelocks() {
-        if (timelockedTinApplies > block.timestamp) {
+        if (timelockedTinApplies <= block.timestamp) {
             _tin = timelockedTin;
             timelockedTinApplies = type(uint256).max;
             emit FileChanged("tin", _tin);
         }
-        if (timelockedToutApplies > block.timestamp) {
+        if (timelockedToutApplies <= block.timestamp) {
             _tout = timelockedTout;
             timelockedToutApplies = type(uint256).max;
             emit FileChanged("tout", _tout);
+        }
+        if (timelockedLockApplies <= block.timestamp) {
+            _timelock = timelockedLock;
+            timelockedLockApplies = type(uint256).max;
+            emit FileChanged("lock", _timelock);
         }
         _;
     }
