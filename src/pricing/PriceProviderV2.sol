@@ -1,47 +1,7 @@
 pragma solidity ^0.8.22;
 
-import "openzeppelin-upgradeable/access/OwnableUpgradeable.sol";
-
-interface IFunctionsConsumer {
-    function s_lastResponse() external view returns (bytes memory);
-    function latestTimestamp() external view returns (uint256 lastUpdated);
-}
-
-interface IChronicle {
-    function readWithAge() external view returns (uint256, uint256);
-}
-
-interface IPriceProvider {
-    function getPrice() external view returns (uint256);
-}
-
-contract PriceProvider is Initializable, OwnableUpgradeable, IPriceProvider {
-    IFunctionsConsumer public consumer;
-    uint256 public timeTolerance;
-
-    error SourceDataStale();
-
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(address _functionsConsumer, uint256 _timeTolerance) public initializer {
-        __Ownable_init();
-        consumer = IFunctionsConsumer(_functionsConsumer);
-        timeTolerance = _timeTolerance;
-    }
-
-    function setTimeTolerance(uint256 newTimeTolerance) public onlyOwner {
-        timeTolerance = newTimeTolerance;
-    }
-
-    function getPrice() public virtual view returns (uint256) {
-        if (consumer.latestTimestamp() + timeTolerance > block.timestamp) revert SourceDataStale();
-        return uint256(bytes32(consumer.s_lastResponse()));
-    }
-
-    uint256[48] __gap;
-}
+import "./interfaces/IChronicle.sol";
+import "./PriceProvider.sol";
 
 contract PriceProviderV2 is PriceProvider {
     enum PriceStrategy {
@@ -81,13 +41,16 @@ contract PriceProviderV2 is PriceProvider {
         _disableInitializers();
     }
 
-    function initializeV2(Source memory _chronicleSource) public reinitializer(2) onlyOwner {
+    function initializeV2(Source memory _chronicleSource) public reinitializer(2) {
         chainlinkSource = Source({
             source: address(consumer),
             sourceType: SourceType.ChainlinkFunctionsConsumer,
             enabled: true
         });
 
+        if (_chronicleSource.sourceType != SourceType.ChronicleDataFeed) {
+            revert();
+        }
         chronicleSource = _chronicleSource;
     }
 
@@ -96,7 +59,7 @@ contract PriceProviderV2 is PriceProvider {
         if (!source.enabled) return (Error.SourceDisabled, 0);
 
         IFunctionsConsumer consumer = IFunctionsConsumer(source.source);
-        if (consumer.latestTimestamp() + timeTolerance > block.timestamp) return (Error.SourceDataStale, 0);
+        if (consumer.latestTimestamp() + timeTolerance < block.timestamp) return (Error.SourceDataStale, 0);
 
         return (Error.NoError, uint256(bytes32(consumer.s_lastResponse())));
     }
@@ -107,7 +70,7 @@ contract PriceProviderV2 is PriceProvider {
 
         IChronicle feed = IChronicle(source.source);
         (uint256 val, uint256 age) = feed.readWithAge();
-        if (age + timeTolerance > block.timestamp) return (Error.SourceDataStale, 0);
+        if (age + timeTolerance < block.timestamp) return (Error.SourceDataStale, 0);
 
         return (Error.NoError, val);
     }
@@ -120,23 +83,9 @@ contract PriceProviderV2 is PriceProvider {
         chronicleSource.enabled = enable;
     }
 
-    function tryGetSourcePrice(Source memory source) internal view returns (Error, uint256) {
-        if (source.sourceType == SourceType.ChainlinkFunctionsConsumer) {
-            return tryGetChainlinkFunctionsPrice(source);
-        } else if (source.sourceType == SourceType.ChronicleDataFeed) {
-            return tryGetChroniclePrice(source);
-        } else revert();
-    }
-
     function handleError(Error err) internal pure {
-        if (err == Error.UnexpectedSourceType) {
-            revert UnexpectedSourceType();
-        } else if (err == Error.SourceDataStale) {
+        if (err == Error.SourceDataStale) {
             revert SourceDataStale();
-        } else if (err == Error.NoSources) {
-            revert NoSources();
-        } else if (err == Error.NoStrategy) {
-            revert NoStrategy();
         } else if (err == Error.SourceDisabled) {
             revert SourceDisabled();
         }
@@ -161,7 +110,7 @@ contract PriceProviderV2 is PriceProvider {
 
         if (isError(clErr)) {
             if (isError(fallbackErr)) {
-                revert NoSources();
+                handleError(fallbackErr);
             }
             return fallbackResponse;
         } else {
