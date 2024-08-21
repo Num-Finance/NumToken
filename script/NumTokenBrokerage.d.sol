@@ -5,7 +5,7 @@ pragma solidity ^0.8.22;
 import "forge-std/Script.sol";
 import "../src/NumTokenBrokerage.sol";
 
-import "./PriceProvider.d.sol";
+import "../src/pricing/interfaces/IPriceProvider.sol";
 
 address constant USDC = 0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582;
 NumToken constant NTST = NumToken(address(0x4ba7AFb4F2925Efb85261737dA1D781F104d2E10));
@@ -19,7 +19,7 @@ contract NumTokenBrokerageDeploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
 
-        NumTokenBrokerage psm = new NumTokenBrokerage(NTST, IERC20(USDC), PriceProvider(ORACLE));
+        NumTokenBrokerage psm = new NumTokenBrokerage(NTST, IERC20Metadata(USDC), IPriceProvider(ORACLE));
         console.log("PSM deployed at", address(psm));
     }
 }
