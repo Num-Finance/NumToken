@@ -1,12 +1,14 @@
 # Compiler files
 cache/
 out/
+docs/
 
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/5/
 /broadcast/*/80001/
 /broadcast/*/31337/
+/broadcast/*/11155420/
 /broadcast/**/dry-run/
 
 # Dotenv file

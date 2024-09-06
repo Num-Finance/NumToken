@@ -6,3 +6,4 @@ erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/
 openzeppelin/=lib/openzeppelin-contracts/contracts/
 openzeppelin-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts/
 layerzero=lib/LayerZero-v2/oapp/contracts
+src=src/

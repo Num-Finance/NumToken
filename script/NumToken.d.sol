@@ -11,6 +11,7 @@ contract NumTokenDeploy is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
+        console.log(vm.addr(deployerPrivateKey));
 
         MinimalForwarder forwarder = MinimalForwarder(vm.envAddress("FORWARDER_ADDRESS"));
 
@@ -63,17 +64,17 @@ contract NumTokenDeploy is Script {
                 );
         }
 
-        address defaultadmin = vm.envAddress("DEFAULT_ADMIN_ROLE");
-        token.grantRole(
-            token.DEFAULT_ADMIN_ROLE(),
-            defaultadmin
-        );
-
-
-        token.renounceRole(
-            token.DEFAULT_ADMIN_ROLE(),
-            vm.addr(deployerPrivateKey)
-        );
+        // address defaultadmin = vm.envAddress("DEFAULT_ADMIN_ROLE");
+        // token.grantRole(
+        //     token.DEFAULT_ADMIN_ROLE(),
+        //     defaultadmin
+        // );
+        //
+        //
+        // token.renounceRole(
+        //     token.DEFAULT_ADMIN_ROLE(),
+        //     vm.addr(deployerPrivateKey)
+        // );
 
         vm.stopBroadcast();
     }
