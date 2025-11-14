@@ -36,14 +36,16 @@ contract UpgradeTwinToken is Script {
         console.log("Current Name:", oldToken.name());
         console.log("Current Symbol:", oldToken.symbol());
         console.log("Total Supply:", oldToken.totalSupply());
-        console.log("Forwarder:", oldToken.trustedForwarder());
+        console.log("Trusted Forwarder:", oldToken.isTrustedForwarder(forwarderAddress));
         
         // Verify forwarder matches
         require(
-            oldToken.trustedForwarder() == forwarderAddress,
+            oldToken.isTrustedForwarder(forwarderAddress),
             "Forwarder address mismatch!"
         );
         
+        console.log("Forwarder verified:", forwarderAddress);
+
         // Deploy new V2 implementation
         console.log("\n=== DEPLOYING V2 ===");
         TwinToken newImpl = new TwinToken(forwarderAddress);
@@ -67,7 +69,7 @@ contract UpgradeTwinToken is Script {
         console.log("New Name:", tokenV2.name());
         console.log("New Symbol:", tokenV2.symbol());
         console.log("Total Supply:", tokenV2.totalSupply());
-        console.log("Forwarder:", tokenV2.trustedForwarder());
+        console.log("Forwarder verified:", tokenV2.isTrustedForwarder(forwarderAddress));
         
         // Verify balances are preserved (check a few if provided)
         string memory checkAddresses = vm.envOr("CHECK_BALANCES", string(""));
