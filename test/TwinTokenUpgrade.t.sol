@@ -15,9 +15,9 @@ import "src/TwinToken.sol";
  * Este test verifica:
  * 1. Deployment del setup completo (Beacon + Proxy + NumToken V1)
  * 2. Upgrade a TwinToken (V2)
- * 3. Preservación de storage (balances, roles, paused state)
+ * 3. Preservación de storage (balances, roles, paused state, disallow list)
  * 4. Cambio de nombre y símbolo
- * 5. Funcionalidad post-upgrade
+ * 5. Funcionalidad post-upgrade (including disallow/blacklist)
  */
 contract TwinTokenUpgradeTest is Test {
     // Contratos
@@ -44,6 +44,7 @@ contract TwinTokenUpgradeTest is Test {
     // Roles
     bytes32 public constant MINTER_BURNER_ROLE = keccak256("MINTER_BURNER_ROLE");
     bytes32 public constant CIRCUIT_BREAKER_ROLE = keccak256("CIRCUIT_BREAKER_ROLE");
+    bytes32 public constant DISALLOW_ROLE = keccak256("DISALLOW_ROLE");
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
 
     function setUp() public {
@@ -293,6 +294,100 @@ contract TwinTokenUpgradeTest is Test {
         assertEq(tokenV2.balanceOf(user2), 300e18);
 
         console.log("[OK] Transfers work after upgrade!");
+    }
+
+    function test_UpgradePreservesDisallowList() public {
+        // 1. Mint tokens to both users FIRST (before disallowing)
+        vm.prank(minter);
+        tokenV1.mint(user1, 1000e18);
+        vm.prank(minter);
+        tokenV1.mint(user2, 500e18);
+
+        // 2. Grant disallow role and disallow user2
+        tokenV1.grantRole(DISALLOW_ROLE, owner);
+        tokenV1.disallow(user2);
+
+        console.log("\n=== Setting up disallow before upgrade ===");
+        assertTrue(tokenV1.isDisallowed(user2), "User2 should be disallowed");
+        assertFalse(tokenV1.isDisallowed(user1), "User1 should not be disallowed");
+
+        // 3. Verify user2 cannot transfer (is disallowed)
+        vm.prank(user2);
+        vm.expectRevert("NumToken: Disallowed account");
+        tokenV1.transfer(user1, 100e18);
+
+        // 4. Upgrade to V2
+        _upgradeToV2();
+
+        // 5. Verify disallow state preserved
+        console.log("\n=== Verifying disallow list preserved ===");
+        assertTrue(tokenV2.isDisallowed(user2), "User2 should still be disallowed after upgrade");
+        assertFalse(tokenV2.isDisallowed(user1), "User1 should still not be disallowed after upgrade");
+
+        // 6. Verify user2 still cannot transfer (disallow preserved)
+        vm.prank(user2);
+        vm.expectRevert("NumToken: Disallowed account");
+        tokenV2.transfer(user1, 100e18);
+
+        // 7. Verify user1 can transfer (not disallowed)
+        vm.prank(user1);
+        tokenV2.transfer(owner, 50e18);
+        assertEq(tokenV2.balanceOf(owner), 50e18);
+
+        console.log("[OK] Disallow list preserved after upgrade!");
+    }
+
+    function test_DisallowFunctionalityWorksAfterUpgrade() public {
+        // 1. Setup: mint tokens and upgrade
+        vm.prank(minter);
+        tokenV1.mint(user1, 1000e18);
+        vm.prank(minter);
+        tokenV1.mint(user2, 1000e18);
+
+        _upgradeToV2();
+
+        console.log("\n=== Testing disallow functionality after upgrade ===");
+
+        // 2. Grant DISALLOW_ROLE to owner (should be preserved or granted)
+        if (!tokenV2.hasRole(DISALLOW_ROLE, owner)) {
+            tokenV2.grantRole(DISALLOW_ROLE, owner);
+        }
+
+        // 3. Both users should be able to transfer initially
+        vm.prank(user1);
+        tokenV2.transfer(user2, 100e18);
+        assertEq(tokenV2.balanceOf(user2), 1100e18);
+
+        // 4. Disallow user1 after upgrade
+        tokenV2.disallow(user1);
+        assertTrue(tokenV2.isDisallowed(user1), "User1 should be disallowed");
+
+        // 5. User1 cannot transfer (disallowed)
+        vm.prank(user1);
+        vm.expectRevert("NumToken: Disallowed account");
+        tokenV2.transfer(user2, 100e18);
+
+        // 6. User2 cannot receive from user1 (sender disallowed)
+        vm.prank(user1);
+        vm.expectRevert("NumToken: Disallowed account");
+        tokenV2.transfer(user2, 50e18);
+
+        // 7. User2 cannot send to user1 (recipient disallowed)
+        vm.prank(user2);
+        vm.expectRevert("NumToken: Disallowed account");
+        tokenV2.transfer(user1, 50e18);
+
+        // 8. Re-allow user1
+        tokenV2.allow(user1);
+        assertFalse(tokenV2.isDisallowed(user1), "User1 should be allowed again");
+
+        // 9. User1 can transfer again
+        vm.prank(user1);
+        tokenV2.transfer(user2, 50e18);
+        assertEq(tokenV2.balanceOf(user1), 850e18);
+        assertEq(tokenV2.balanceOf(user2), 1150e18);
+
+        console.log("[OK] Disallow functionality works after upgrade!");
     }
 
     // Helper function to upgrade to V2
