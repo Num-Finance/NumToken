@@ -4,7 +4,7 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "openzeppelin/proxy/beacon/UpgradeableBeacon.sol";
 import "src/NumToken.sol";
-import "src/NumTokenV2.sol";
+import "src/TwinToken.sol";
 
 /**
  * Script to upgrade NumToken to NumTokenV2
@@ -84,7 +84,7 @@ contract UpgradeTwinToken is Script {
         
         vm.stopBroadcast();
         
-        console.log("\n✅ Upgrade completed successfully!");
+        console.log("\n Upgrade completed successfully!");
         console.log("Token metadata updated while preserving all storage.");
     }
 }

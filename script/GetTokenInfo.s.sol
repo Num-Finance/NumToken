@@ -48,12 +48,7 @@ contract GetTokenInfo is Script {
         
         // ERC2771 Info
         console.log("\n=== ERC2771 INFO ===");
-        try token.trustedForwarder() returns (address forwarder) {
-            console.log("Trusted Forwarder:", forwarder);
-        } catch {
-            console.log("Could not read forwarder (might not be ERC2771)");
-        }
-        
+
         // Circuit Breaker
         console.log("\n=== CIRCUIT BREAKER ===");
         try token.paused() returns (bool isPaused) {
@@ -89,20 +84,15 @@ contract GetTokenInfo is Script {
         
         // Roles (if we can determine some addresses to check)
         console.log("\n=== ROLES ===");
-        console.log("To check specific addresses for roles, use:");
-        console.log("cast call", vm.toString(tokenAddress), "hasRole(bytes32,address)(bool)", "ROLE_HASH", "ADDRESS", "--rpc-url", rpcUrl);
-        
+        console.log("To check specific addresses for roles, use cast call");
+
         console.log("\n=== USEFUL COMMANDS ===");
-        console.log("Get forwarder:");
-        console.log("cast call", vm.toString(tokenAddress), "trustedForwarder()(address)", "--rpc-url", rpcUrl);
-        console.log("\nGet beacon:");
-        console.log("cast call", vm.toString(tokenAddress), "beacon()(address)", "--rpc-url", rpcUrl);
-        console.log("\nGet implementation:");
-        console.log("cast implementation", vm.toString(tokenAddress), "--rpc-url", rpcUrl);
-        console.log("\nGet admin:");
-        console.log("cast admin", vm.toString(tokenAddress), "--rpc-url", rpcUrl);
-        console.log("\nCheck balance:");
-        console.log("cast call", vm.toString(tokenAddress), "balanceOf(address)(uint256)", "ADDRESS", "--rpc-url", rpcUrl);
+        console.log("Token address:", tokenAddress);
+        console.log("Use these commands with cast to get more info:");
+        console.log("- Check forwarder: cast call TOKEN 'isTrustedForwarder(address)(bool)' FORWARDER");
+        console.log("- Get beacon: cast call TOKEN 'beacon()(address)'");
+        console.log("- Get implementation: cast implementation TOKEN");
+        console.log("- Check balance: cast call TOKEN 'balanceOf(address)(uint256)' ADDRESS");
     }
     
     // Helper function to get implementation
