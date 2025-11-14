@@ -16,7 +16,7 @@ import "src/NumTokenV2.sol";
  * 
  * IMPORTANT: All storage (balances, roles, etc.) is preserved!
  */
-contract UpgradeNumToken is Script {
+contract UpgradeTwinToken is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         address proxyAddress = vm.envAddress("TOKEN_PROXY_ADDRESS");
@@ -46,8 +46,8 @@ contract UpgradeNumToken is Script {
         
         // Deploy new V2 implementation
         console.log("\n=== DEPLOYING V2 ===");
-        NumTokenV2 newImpl = new NumTokenV2(forwarderAddress);
-        console.log("NumTokenV2 deployed at:", address(newImpl));
+        TwinToken newImpl = new TwinToken(forwarderAddress);
+        console.log("TwinToken deployed at:", address(newImpl));
         
         // Upgrade the Beacon
         console.log("\n=== UPGRADING BEACON ===");
@@ -58,7 +58,7 @@ contract UpgradeNumToken is Script {
         
         // Initialize V2 with new metadata
         console.log("\n=== INITIALIZING V2 ===");
-        NumTokenV2 tokenV2 = NumTokenV2(proxyAddress);
+        TwinToken tokenV2 = TwinToken(proxyAddress);
         tokenV2.initializeV2(newName, newSymbol);
         console.log("V2 initialized with new metadata");
         

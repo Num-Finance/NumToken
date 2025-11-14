@@ -8,7 +8,7 @@ import "src/NumToken.sol";
  * This contract adds the ability to update the token name and symbol
  * after deployment while preserving all storage (balances, roles, etc.)
  */
-contract NumTokenV2 is NumToken {
+contract TwinToken is NumToken {
     /**
      * @notice Constructor that takes the same forwarder as V1
      * @param forwarder_ The ERC2771 forwarder address (must match V1)
