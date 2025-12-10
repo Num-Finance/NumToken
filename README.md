@@ -100,3 +100,40 @@ forge test --match-contract <ContractName>
 
 or execute the scripts in simulation mode (`--fork-url`) to ensure the call sequence completes without reverting before sending real transactions.
 
+# Deploy Twin Token
+Set the environment variables in `.env.prod` file and run the bash script:
+```bash
+./deploy_twin_token.sh
+```
+
+This script will deploy the Twin Token contract and the Twin Proxy Token contract.
+
+# Deploy Twin Proxy Token
+If you want to deploy the Twin Proxy Token contract, you need to have the Twin Token contract deployed first.
+
+This script will deploy the Twin Proxy Token contract with ths same Beacon and Implementation contracts from the Twin Token contract deployed.
+
+Set the environment variables in `.env.prod` file and run the bash script:
+
+```bash
+./deploy_twin_proxy_token.sh
+```
+
+# Verify Twin Token
+To verify the Twin Token contract, you need to have the Twin Token contract deployed first.
+
+NOTE: For the Twin Token Proxies contracts with the same Beacon and Implementation you do not need to verify them again.
+
+```bash
+FORWARDER_ADDRESS=0xforwarder... \
+ETHERSCAN_API_KEY=your_api_key... \
+./verify_twin_token.sh \
+<chainid> <implementation> <forwarder (not used)> <beacon> <proxy>
+```
+
+Example:
+```bash
+FORWARDER_ADDRESS=0xforwarder... \
+ETHERSCAN_API_KEY=your_api_key... \
+./verify_twin_token.sh 31337 0ximplemetation _ 0xbeacon 0xproxy_contract
+```
