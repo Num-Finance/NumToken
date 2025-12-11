@@ -5,34 +5,43 @@ import "openzeppelin/metatx/MinimalForwarder.sol";
 import "openzeppelin/proxy/beacon/BeaconProxy.sol";
 import "openzeppelin/proxy/beacon/UpgradeableBeacon.sol";
 
-import "src/NumToken.sol";
+import "src/TwinToken.sol";
 
-contract NumTokenDeploy is Script {
+/**
+ * @title ExtraTwinTokenDeploy
+ * @author Twin Finance
+ * @notice This script deploys a TwinToken contract using an existing beacon.
+ */
+contract TwinTokenDeploy is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
-        console.log(vm.addr(deployerPrivateKey));
+        address beacon;
 
-        MinimalForwarder forwarder = MinimalForwarder(vm.envAddress("FORWARDER_ADDRESS"));
+        {
+            string memory jsonPath = string(abi.encodePacked(
+                "./broadcast/TwinToken.d.sol/",
+                vm.toString(block.chainid),
+                "/run-latest.json"
+            ));
+            string memory BeaconJson = string(vm.readFile(jsonPath));
 
-        // NOTE: `forwarder` is immutable and can't be changed after deployment.
-        //        we're using a MinimalForwarder here which provides basic functionality
-        //        for metatransactions - but this scheme does ** NOT ** support upgrades to this
-        //        variable. Consider making the forwarder upgradeable?
-        NumToken tokenImpl = new NumToken(address(forwarder));
-
-        UpgradeableBeacon beacon = new UpgradeableBeacon(address(tokenImpl));
+            beacon = abi.decode(vm.parseJson(BeaconJson, ".transactions[1].contractAddress"), (address));
+        }
 
         BeaconProxy tokenProxy = new BeaconProxy(
             address(beacon), ""
         );
 
-        NumToken token = NumToken(address(tokenProxy));
+        string memory name = vm.envString("TOKEN_NAME");
+        string memory symbol = vm.envString("TOKEN_SYMBOL");
+
+        TwinToken token = TwinToken(address(tokenProxy));
 
         /// Deploy a token instance
-        NumToken(address(tokenProxy)).initialize(
-            "Num ARS",
-            "nARS"
+        TwinToken(address(tokenProxy)).initialize(
+            name,
+            symbol
         );
 
         /// Set up roles
@@ -64,18 +73,19 @@ contract NumTokenDeploy is Script {
                 );
         }
 
-        // address defaultadmin = vm.envAddress("DEFAULT_ADMIN_ROLE");
-        // token.grantRole(
-        //     token.DEFAULT_ADMIN_ROLE(),
-        //     defaultadmin
-        // );
-        //
-        //
-        // token.renounceRole(
-        //     token.DEFAULT_ADMIN_ROLE(),
-        //     vm.addr(deployerPrivateKey)
-        // );
+        address defaultadmin = vm.envAddress("DEFAULT_ADMIN_ROLE");
+
+        token.grantRole(
+            token.DEFAULT_ADMIN_ROLE(),
+            defaultadmin
+        );
 
         vm.stopBroadcast();
+
+        console.log(string(abi.encodePacked(
+            name,
+            " deployed to ",
+            vm.toString(address(tokenProxy))
+        )));
     }
 }

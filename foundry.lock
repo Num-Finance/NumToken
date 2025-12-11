@@ -1,0 +1,23 @@
+{
+  "lib/LayerZero-v2": {
+    "rev": "98e006c5bd2a6458b572d8a9bc84c1163104f0ac"
+  },
+  "lib/forge-std": {
+    "rev": "bf6606142994b1e47e2882ce0cd477c020d77623"
+  },
+  "lib/gsn": {
+    "rev": "13b69a6804e12c7f670ae0c88d90396bb6aed651"
+  },
+  "lib/openzeppelin-contracts": {
+    "rev": "634710d7950728c6b696fa5b4522ac02a74a8617"
+  },
+  "lib/openzeppelin-contracts-upgradeable": {
+    "rev": "25aabd286e002a1526c345c8db259d57bdf0ad28"
+  },
+  "lib/solidity-examples": {
+    "rev": "30d689631e55d368f9bc3864f9b6a6ea418b001e"
+  },
+  "lib/solmate": {
+    "rev": "8d910d876f51c3b2585c9109409d601f600e68e1"
+  }
+}

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "forge-std/script.sol";
+import "forge-std/Script.sol";
 import "openzeppelin/metatx/MinimalForwarder.sol";
 import "openzeppelin/proxy/beacon/BeaconProxy.sol";
 import "openzeppelin/proxy/beacon/UpgradeableBeacon.sol";
