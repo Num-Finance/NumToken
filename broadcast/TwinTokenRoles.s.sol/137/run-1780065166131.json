@@ -1,0 +1,30 @@
+{
+  "transactions": [
+    {
+      "hash": "0x2a41aa2f4ceb0059d624fa84e0e50d8bcf95b86655324888dd306cb2b6db29a4",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x59863989d080b22476db95656d0c3cc18be92214",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x59863989d080b22476db95656d0c3cc18be92214",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x15f",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1780065166131,
+  "chain": 137,
+  "commit": "16e8eae"
+}

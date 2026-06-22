@@ -127,7 +127,7 @@ NOTE: For the Twin Token Proxies contracts with the same Beacon and Implementati
 ```bash
 FORWARDER_ADDRESS=0xforwarder... \
 ETHERSCAN_API_KEY=your_api_key... \
-./verify_twin_token.sh \
+./verify-twin-token.sh \
 <chainid> <implementation> <forwarder (not used)> <beacon> <proxy>
 ```
 
@@ -135,5 +135,5 @@ Example:
 ```bash
 FORWARDER_ADDRESS=0xforwarder... \
 ETHERSCAN_API_KEY=your_api_key... \
-./verify_twin_token.sh 31337 0ximplemetation _ 0xbeacon 0xproxy_contract
+./verify-twin-token.sh 31337 0ximplemetation _ 0xbeacon 0xproxy_contract
 ```

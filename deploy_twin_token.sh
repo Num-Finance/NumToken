@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENV_FILE="/home/ariel/Desktop/Num/repos/NumToken/.env.prod"
+ENV_FILE="$PWD/.env.prod"
 if [ ! -f "$ENV_FILE" ]; then
   echo "No se encontró $ENV_FILE" >&2
   exit 1
