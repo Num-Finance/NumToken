@@ -1,0 +1,599 @@
+{
+  "transactions": [
+    {
+      "hash": "0x806f79445b97e7a5f56392119e02b13cab18bddcc9bcddf20833e19daa13d166",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x9b",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x7a351dd5daa3bc73df1e9aaf17e3ec70de9f13e50ff90a0b6412e59cbc849327",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x9c",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x62d6027ab04c8efb180010ef9a622f0dede9b4497c00341dab63332a7d27235e",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x50464be58912745447e24eb3bbdedcee10d3e056",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x9d",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xa3b956b612b34130f10a1a3a2a54958029bf8b622eede88aadaa34f2ba92d212",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x59863989d080b22476db95656d0c3cc18be92214",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x59863989d080b22476db95656d0c3cc18be92214",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x9e",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x58aad66bf19f43f6babc3304a25539b9f7dcd10b46c7794b2c8755d5112f25ce",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x59863989d080b22476db95656d0c3cc18be92214",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x59863989d080b22476db95656d0c3cc18be92214",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0x9f",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x0151540c237d003fa689c8231e8ab8c6d90a39194cc478292796d907706647b4",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x59863989d080b22476db95656d0c3cc18be92214",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x59863989d080b22476db95656d0c3cc18be92214",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa0",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xeb2971ed11891ed16c0713f193ae4db6fc40162e02bdc5d78f48bc6a2e981ee4",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0xcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b3",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa1",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x4212b10e0565cba51397ae7dbe0e290ad5d519a0468f12aa84a3ba4bec022613",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0x0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa2",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xb01967f1494e605f085977c2ff04c5aa588b4b7515d2d03e64d9e49a5bc8503a",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0x7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a265492",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xfa658f62ca6cacaa769035adbcbed9bf75f9f72d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa3",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xc7c95ec3b69c57a295f2c8e816aaace54abfee8c8eb8fbee2827499c751669e7",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa4",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xfdfa17a59d7186145023f55966f08fbc16c6934dd98e393f40653bcc5b17537e",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa5",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x9c090528e4cc81ddf895f0c023ce480ae15338dd27671475f527d0917be5ff9e",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x1ea02ba45fc146f534b371c49fbb2a4c86dce93d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa6",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x546b66e9335b551ebdbe9263e7c30420adec5c8524c3cc0095339c54f128d3b9",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa7",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x8bfbb3f459cb49154f5b014f69e4feb143356de2c71e8186818ebb46e8af1e65",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa8",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x0e989b653f8eb367ef3ba8344fa0113dc98dfbd0bfbc9f00e297f334056b572b",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x53bd6e8af3da05781afc98729378424f66c9da52",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xa9",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x279be4fd8ec778d2a9e3a843280c517a9cb7f6f3e9f15ad9912e2d48bcfbc678",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0xcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b3",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xaa",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x5a5959db6c81d0d7feb56b522c6955bbf915c3b4e21c6cce6ed17315256e6596",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0x0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xab",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x3353560ee99843502a0e2dfedabd55bebc99ced319ce08a3dd4b8bd44758f5d0",
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+      "function": "revokeRole(bytes32,address)",
+      "arguments": [
+        "0x7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a265492",
+        "0x3F5C58f0b2400Cd82eA7ea6c3B5794a1228f3Df9"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xb9a848a8e1aff1a16a27f1ad3b66d873d5c38d62",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xac",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xd0599a90a5a4dde542f682f6dfca2b6ac20c4b9c8172c5fcde9b14edb54539b1",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xad",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xa8c384390f2cf5dca3ae62c739c2655708d6e6ba8e98d1ab7ea772ade1061da3",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xae",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x2aedfc74eefe6e0e735068ab2a487e0572522a1a62046c5268fd566d8122d67a",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x20eca820d3cd00ed9c9f2861cdf6429bacd8ed55",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xaf",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x222aab42525ca352c66d76438381609302be899a0dc8a74ebf98e2caca43ff86",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb0",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xd4a9956ead3549f7955da847a83bcea41a4c481e6db1765b9f6f0bc54ba94e7c",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb1",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xbdcc9d58cc8f0e0c920614564e167c00c730f3c392baefc39074212a04c22516",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x5884ffd7597e05493f83ff44e96befd4f0fe474d",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb2",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x4a9cbd5fec958edfa542ef22ee143e664a4c28f2695092652742a576aa685f4f",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb3",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xb8eba48cca1ff5cf47a72cd04912f5690aa7ddf78daf40e8fc79d20003f4dd55",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb4",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0xad0d6240923901f29b1295db33908e7c135e3d7c6f3b3c2a384c44a0828a0fa9",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xaef12aff8054128d5d3dd848f6d645854e0cd426",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb5",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x8e08012aa4c4a7f1f55287b96f2ece65fa2e45b66171ca9d3258fc598e74ade1",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741fcfd53186d792f1ec9d0679afc2dc3ffc86fc31fe1e0f342b838eb6c3eade62b30000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb6",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x7005abe9209211611aea06a53172c0945e1af65d2e62f83da0a597efee6eeeb7",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f0726c8258b9de94ffd154f603b315240b42c2424db4dbb983018049e43a2df1a0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb7",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    },
+    {
+      "hash": "0x2c19141ee0fe266ad259a07caf161a08ade41ddc56074723adfb7ebfd63fb166",
+      "transactionType": "CALL",
+      "contractName": "BeaconProxy",
+      "contractAddress": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+      "function": null,
+      "arguments": null,
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0x0b60fafc79761a28db657707baebb34fc6589b73",
+        "gas": "0xea27",
+        "value": "0x0",
+        "input": "0xd547741f7e6b58bc1470e1fc07bc9b21e0435be41fdc30ede9591781476a8d169a2654920000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "nonce": "0xb8",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1779453358430,
+  "chain": 137,
+  "commit": "16e8eae"
+}

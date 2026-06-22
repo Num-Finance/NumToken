@@ -11,8 +11,7 @@ source "$ENV_FILE"
 set +a
 
 forge script \
-    script/ExtraTwinToken.d.sol:TwinTokenDeploy \
+    script/TwinTokenRoles.s.sol:TwinTokenRolesScript \
     --rpc-url $RPC_URL \
     -vvvv \
-    --verifier etherscan \
     --broadcast
