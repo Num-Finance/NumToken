@@ -2,7 +2,7 @@
 
 chainid=$1
 impl=$2
-forwarder=$FORWARDER_ADDRESS
+forwarder=$3
 beacon=$4
 proxy=$5
 
