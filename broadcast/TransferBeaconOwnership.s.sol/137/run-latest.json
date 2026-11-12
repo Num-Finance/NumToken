@@ -1,0 +1,85 @@
+{
+  "transactions": [
+    {
+      "hash": "0xbd2cde4ffdcbaf783c120da7b7d179ff3a923060ec01ca3950536977834dfe0f",
+      "transactionType": "CALL",
+      "contractName": "UpgradeableBeacon",
+      "contractAddress": "0xa92426af5c8a9edf335fabc55716965dc9e08f32",
+      "function": "transferOwnership(address)",
+      "functionAbi": "function transferOwnership(address newOwner)",
+      "arguments": [
+        "0x1c1f3cd3bcBcaAF16E9566C686cfd975E49bBd64"
+      ],
+      "transaction": {
+        "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+        "to": "0xa92426af5c8a9edf335fabc55716965dc9e08f32",
+        "gas": "0x9c9f",
+        "value": "0x0",
+        "input": "0xf2fde38b0000000000000000000000001c1f3cd3bcbcaaf16e9566c686cfd975e49bbd64",
+        "nonce": "0x1be",
+        "chainId": "0x89"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [
+    {
+      "type": "0x2",
+      "status": "0x1",
+      "cumulativeGasUsed": "0x12b6dcc",
+      "logs": [
+        {
+          "address": "0xa92426af5c8a9edf335fabc55716965dc9e08f32",
+          "topics": [
+            "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+            "0x0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+            "0x0000000000000000000000001c1f3cd3bcbcaaf16e9566c686cfd975e49bbd64"
+          ],
+          "data": "0x",
+          "blockHash": "0x16f05fc7931c5baceba2fb09dd47ec72ad1ec8d38dfc4ff7ceb85216c96c24f3",
+          "blockNumber": "0x5cb08f2",
+          "blockTimestamp": "0x6af5cd1b",
+          "transactionHash": "0xbd2cde4ffdcbaf783c120da7b7d179ff3a923060ec01ca3950536977834dfe0f",
+          "transactionIndex": "0x3c",
+          "logIndex": "0x29d",
+          "removed": false
+        },
+        {
+          "address": "0x0000000000000000000000000000000000001010",
+          "topics": [
+            "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+            "0x0000000000000000000000000000000000000000000000000000000000001010",
+            "0x0000000000000000000000003f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+            "0x0000000000000000000000007ee41d8a25641000661b1ef5e6ae8a00400466b0"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000009c27fdaa0c3c000000000000000000000000000000000000000000000001bf7af50295009bb1d0000000000000000000000000000000000000000000d5e4b8ee2533d5145637900000000000000000000000000000000000000000000001bf7a58da97568f75d0000000000000000000000000000000000000000000d5e4b8eec15bd2be62739",
+          "blockHash": "0x16f05fc7931c5baceba2fb09dd47ec72ad1ec8d38dfc4ff7ceb85216c96c24f3",
+          "blockNumber": "0x5cb08f2",
+          "blockTimestamp": "0x6af5cd1b",
+          "transactionHash": "0xbd2cde4ffdcbaf783c120da7b7d179ff3a923060ec01ca3950536977834dfe0f",
+          "transactionIndex": "0x3c",
+          "logIndex": "0x29e",
+          "removed": false
+        }
+      ],
+      "logsBloom": "0x00000000004400000000000000000000000000000000000000800000000000000000008000000000000000000000000000008000000000000000000000000000000000000000008000000000000000800001000000000000000100000000000000000000000000000004000000000000000000000000000080000000000000400000000000000000020000000400000000000000000000000000000000000000200008000000000008000000000000000000000000000000002000000000004000000000000000000001000000000000000000400000000000100000008000000000000000000000000000000000000000000000000000000000000000100000",
+      "transactionHash": "0xbd2cde4ffdcbaf783c120da7b7d179ff3a923060ec01ca3950536977834dfe0f",
+      "transactionIndex": "0x3c",
+      "blockHash": "0x16f05fc7931c5baceba2fb09dd47ec72ad1ec8d38dfc4ff7ceb85216c96c24f3",
+      "blockNumber": "0x5cb08f2",
+      "gasUsed": "0x7b3d",
+      "effectiveGasPrice": "0x504d7653f0",
+      "from": "0x3f5c58f0b2400cd82ea7ea6c3b5794a1228f3df9",
+      "to": "0xa92426af5c8a9edf335fabc55716965dc9e08f32",
+      "contractAddress": null
+    }
+  ],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1794493723262,
+  "chain": 137,
+  "commit": "aabdd2c",
+  "recovery_generation": "0x8d023009816bc6dcf698b1391b52dc778d94bbe7b0e45963d17f491b97c99f23"
+}
