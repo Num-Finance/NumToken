@@ -9,6 +9,16 @@ docs/
 /broadcast/*/80001/
 /broadcast/*/31337/
 /broadcast/*/11155420/
+/broadcast/*/11155111/
+/broadcast/*/421614/
+/broadcast/*/84532/
+/broadcast/*/80002/
+/broadcast/*/97/
+/broadcast/*/43113/
+/broadcast/*/44787/
+/broadcast/*/11142220/
+/broadcast/*/17000/
+/broadcast/*/560048/
 /broadcast/**/dry-run/
 
 # Dotenv file
